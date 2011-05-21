@@ -17,7 +17,10 @@
              $session = Session::instance();
 
              if (Auth::instance()->logged_in()){
-                echo '<li>'.Html::anchor('admin_user', 'User admin').'</li>';
+		echo '<li>'.Html::anchor('app_manager', 'Apps').'</li>';
+		echo '<li>'.Html::anchor('app_store', 'Store').'</li>';
+                echo '<li>'.Html::anchor('app_store/register', 'Register Application').'</li>';
+		// echo '<li>'.Html::anchor('admin_user', 'User admin').'</li>';
                 echo '<li>'.Html::anchor('user/profile', 'My profile').'</li>';
                 echo '<li>'.Html::anchor('user/logout', 'Log out').'</li>';
              } else {
