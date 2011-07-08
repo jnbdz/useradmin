@@ -57,9 +57,9 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 	 */
 	public function register($fields) 
 	{
-
+echo 'Register!';
 		$user = CASSANDRA::selectColumnFamily('Users');
-	
+die('selected!');	
 		try 
 		{
 
