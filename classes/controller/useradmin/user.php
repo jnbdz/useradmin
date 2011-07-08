@@ -88,7 +88,7 @@ class Controller_Useradmin_User extends Controller_App {
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Edit user profile');
       $user = Auth::instance()->get_user();
-      $id = $user->id;
+      $username = $user->username;
       // load the content from view
       $view = View::factory('user/profile_edit');
 
@@ -100,6 +100,7 @@ class Controller_Useradmin_User extends Controller_App {
          }
 
          try {
+
             $user->update_user($_POST, array(
                'username',
                'password',
@@ -174,10 +175,10 @@ class Controller_Useradmin_User extends Controller_App {
 
          try {
             if( ! $optional_checks ) {
-               throw new ORM_Validation_Exception("Invalid option checks");
+               //throw new ORM_Validation_Exception("Invalid option checks");
             }
             Auth::instance()->register( $_POST, TRUE );
-
+die('Success!');
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
             // redirect to the user account

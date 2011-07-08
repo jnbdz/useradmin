@@ -1,7 +1,14 @@
-<?php
-class Model_User_Identity extends ORM {
+<?php defined('SYSPATH') or die('No direct access allowed.');
+/**
+ * Model to handle user identity
+ *
+ * @package	Useradmin/Identity
+ * @author	Useradmin Team
+ * @copyright	(c) 2011 Useradmin Team
+ * @license	...
+ */
+class Model_User_Identity {
 
-   protected $_table_name = 'user_identity';
    protected $_belongs_to = array(
            'user' => array(),
       );
@@ -13,9 +20,12 @@ class Model_User_Identity extends ORM {
    public function rules()
    {
       return array(
-         'user_id' => array(
-            array('not_empty'),
-            array('numeric'),
+         'username' => array(
+		array('not_empty'),
+		array('min_length', array(':value', 4)),
+		array('max_length', array(':value', 32)),
+		array('regex', array(':value', '/^[-\pL\pN_.]++$/uD')),
+		array(array($this, 'username_available'), array(':validation', ':field')),
          ),
          'provider' => array(
             array('not_empty'),
@@ -39,14 +49,20 @@ class Model_User_Identity extends ORM {
     */
    public function unique_identity (Validation $validation, $field)
    {
-      $identity_exists = (bool) DB::select(array('COUNT("*")', 'total_count'))
-         ->from($this->_table_name)
-         ->where('identity', '=', $validation['identity'])
-         ->and_where('provider', '=', $validation['provider'])
-         ->execute($this->_db)
-         ->get('total_count');
-      if ($identity_exists) {
-         $validation->error($field, 'identity_available', array($validation[$field]));
-      }
+	try
+	{
+		CASSANDRA::selectColumnFamily('Users');
+		$identity_exists = (bool) CASSANDRA::getIndexedSlides(array(
+			'identity' => $validation['identity'],
+			'provider' => $validation['provider'],
+		));
+		if ($identity_exists)
+		{
+			$validation->error($field, 'identity_available', array($validation[$field]));
+		}
+	} catch (Exception $e)
+	{
+		return TRUE;
+	} 
    }
 }
