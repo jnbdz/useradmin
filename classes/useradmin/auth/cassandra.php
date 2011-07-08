@@ -57,23 +57,9 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 	 */
 	public function register($fields) 
 	{
-echo 'Register!';
-		$user = CASSANDRA::selectColumnFamily('Users');
-die('selected!');	
 		try 
 		{
-
-			Model_User::get_password_validation($fields)->rule('password', 'not_empty');
-
-			$user->insert($fields['username'], array(
-				'username',
-				'password',
-				'email',
-			));
-
-			// Add the login role to the user (add a row to the db)
-			$login_role = new Model_Role(array('name' =>'login'));
-			$user->add('roles', $login_role);
+			Model_User::create_user($fields, $fields['username']);
 		} 
 		catch (ORM_Validation_Exception $e) 
 		{
