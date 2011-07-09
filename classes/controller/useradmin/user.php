@@ -177,7 +177,7 @@ class Controller_Useradmin_User extends Controller_App {
             if( ! $optional_checks ) {
                //throw new ORM_Validation_Exception("Invalid option checks");
             }
-            Auth::instance()->register( $_POST, TRUE );
+            Auth::instance()->register( $_POST );
 die('Success!');
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
