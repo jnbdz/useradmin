@@ -13,12 +13,15 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 	 */
 	protected function _login($user, $password, $remember) 
 	{
-		if ( ! is_object($user))
+
+		if ( ! is_array($user))
 		{
 			$username = $user;
 
 			// Load the user
 			$user = CASSANDRA::selectColumnFamily('Users')->get($username);
+		} else {
+			$username = $user['username'];
 		}
 		
 		// if there are too many recent failed logins, fail now
