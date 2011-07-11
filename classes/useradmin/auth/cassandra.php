@@ -61,7 +61,6 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		{
 			$model_User = new Model_User();
 			$model_User->create_user($fields, $fields['username']);
-die('Model works!');
 		} 
 		catch (ORM_Validation_Exception $e) 
 		{
