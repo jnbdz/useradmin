@@ -42,7 +42,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			$user['last_failed_login'] = date("Y-m-d H:i:s");
 			CASSANDRA::selectColumnFamily('Users')->insert($username, $user);
 		}
-		
+die('Bravo!');		
 		return $status;
 	}
 	
