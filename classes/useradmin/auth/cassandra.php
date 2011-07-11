@@ -23,10 +23,11 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		
 		// if there are too many recent failed logins, fail now
 		if (($this->_config["useradmin"]["max_failed_logins"] > 0) && ($user['failed_login_count'] >= $this->_config["useradmin"]["max_failed_logins"] ) && (strtotime($user['last_failed_login']) > strtotime("-".$this->_config["useradmin"]["login_jail_time"] ) )) 
-		{die('FALSE');
+		{
 			// do nothing, and fail (too many failed logins within {login_jail_time} minutes).
 			return FALSE;
 		}
+die('Here');
 		// Loads default driver before extend the results
 		$status = parent::_login($user, $password, $remember);
 
