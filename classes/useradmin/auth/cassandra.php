@@ -27,10 +27,10 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			// do nothing, and fail (too many failed logins within {login_jail_time} minutes).
 			return FALSE;
 		}
-die('Here');
+
 		// Loads default driver before extend the results
 		$status = parent::_login($user, $password, $remember);
-
+die('From');
 		if($status) 
 		{
 			// Successful login
