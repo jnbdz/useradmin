@@ -244,7 +244,6 @@ die('Login Success!');
     */
    public function action_login() {
       // ajax login
-	die('action_login!');
       if($this->request->is_ajax() && isset($_REQUEST['username'], $_REQUEST['password'])) {
          $this->auto_render = false;
          $this->request->headers('Content-Type', 'application/json');
