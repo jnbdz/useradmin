@@ -28,6 +28,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			return FALSE;
 		}
 
+		$user['username'] = $username;
 		// Loads default driver before extend the results
 		$status = parent::_login($user, $password, $remember);
 die('From');
