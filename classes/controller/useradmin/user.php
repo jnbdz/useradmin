@@ -266,9 +266,11 @@ die('Login Success!');
          $this->template->title = __('Login');
          // If user already signed-in
          if(Auth::instance()->logged_in() != 0){
+		die('logged_in = true');
             // redirect to the user account
             $this->request->redirect('user/profile');
          }
+die('logged_in = FALSE');
          $view = View::factory('user/login');
          // If there is a post and $_POST is not empty
          if ($_REQUEST && isset($_REQUEST['username'], $_REQUEST['password'])) {
