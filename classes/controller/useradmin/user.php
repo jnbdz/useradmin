@@ -270,7 +270,7 @@ die('Login Success!');
             // redirect to the user account
             $this->request->redirect('user/profile');
          }
-die('logged_in = FALSE');
+//die('logged_in = FALSE');
          $view = View::factory('user/login');
          // If there is a post and $_POST is not empty
          if ($_REQUEST && isset($_REQUEST['username'], $_REQUEST['password'])) {
