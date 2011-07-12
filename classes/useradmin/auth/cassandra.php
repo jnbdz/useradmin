@@ -20,7 +20,8 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 
 			// Load the user
 			$user = CASSANDRA::selectColumnFamily('Users')->get($username);
-		} else {
+		} else
+		{
 			$username = $user['username'];
 		}
 		
@@ -34,7 +35,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		$user['username'] = $username;
 		// Loads default driver before extend the results
 		$status = parent::_login($user, $password, $remember);
-die('From');
+
 		if($status) 
 		{
 			// Successful login
@@ -47,7 +48,7 @@ die('From');
 			$user['last_failed_login'] = date("Y-m-d H:i:s");
 			CASSANDRA::selectColumnFamily('Users')->insert($username, $user);
 		}
-die('Bravo!');		
+
 		return $status;
 	}
 	
