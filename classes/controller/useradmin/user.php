@@ -78,7 +78,7 @@ class Controller_Useradmin_User extends Controller_App {
       }
       $view = $this->template->content = View::factory('user/profile');
       // retrieve the current user and set the view variable accordingly
-die(var_dump(Auth::instance()->get_user()));
+//die(var_dump(Auth::instance()->get_user()));
       $view->set('user', Auth::instance()->get_user() );
    }
 
