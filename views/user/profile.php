@@ -19,8 +19,9 @@
 
       <?php
       $providers = array_filter(Kohana::config('useradmin.providers'));
-      $identities = $user->user_identity->find_all();
-      if($identities->count() > 0) {
+      $user_identity = new Model_User_Identity();
+      $identities = $user_identity->get_identities($user->username);
+      if(count($identities) > 0) {
          echo '<h2>Accounts associated with your user profile</h2><p>';
          foreach($identities as $identity) {
             echo '<a class="associated_account" style="background: #FFF url(/img/small/'.$identity->provider.'.png) no-repeat center center"></a>';
