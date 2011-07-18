@@ -17,7 +17,7 @@ class Model_User_Identity {
     * Rules for the user identity.
     * @return array Rules
     */
-	private $_rules = array(
+/*	private $_rules = array(
 		'username' => array(
 			array('not_empty'),
 			array('min_length', array(':value', 4)),
@@ -34,7 +34,7 @@ class Model_User_Identity {
 			array('max_length', array(':value', 255)),
 			array(array($this, 'unique_identity'), array(':validation', ':field')),
 		),
-	);
+	);*/
 
    /**
     * Triggers error if identity exists.
