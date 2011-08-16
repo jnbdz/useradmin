@@ -24,7 +24,7 @@ echo $form->open('user/profile_edit');
       <li><h2><?php echo __('Roles'); ?></h2></li>
       <li><table class="content">
          <tr class="heading"><td><?php echo __('Role'); ?></td><td><?php echo __('Description'); ?></td></tr>
-     <?php
+     <?php /*
          $i = 0;
          foreach($user_roles as $role => $description) {
             echo '<tr';
@@ -35,7 +35,7 @@ echo $form->open('user/profile_edit');
             echo '<td>'.ucfirst($role).'</td><td>'.$description.'</td>';
             echo '</tr>';
             $i++;
-         }
+         }*/
       ?>
             </table>
       </li>
