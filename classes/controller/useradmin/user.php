@@ -89,7 +89,7 @@ class Controller_Useradmin_User extends Controller_App {
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Edit user profile');
       $user = Auth::instance()->get_user();
-      var_dump($user);
+      die(var_dump($user));
       $username = $user['username'];
       // load the content from view
       $view = View::factory('user/profile_edit');
