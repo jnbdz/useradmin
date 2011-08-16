@@ -182,7 +182,7 @@ class Controller_Useradmin_User extends Controller_App {
 
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
-die('Login Success!');
+
             // redirect to the user account
             $this->request->redirect('user/profile');
          } catch (ORM_Validation_Exception $e) {

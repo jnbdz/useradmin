@@ -43,10 +43,11 @@ class Controller_Useradmin_Admin_User extends Controller_App {
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('User administration');
       // create a user
-      $user = ORM::factory('user');
+      $user = CASSANDRA::selectColumnFamily('Users');
       // This is an example of how to use Kohana pagination
       // Get the total count for the pagination
-      $total = $user->count_all();
+      $numRows = CASSANDRA::selectColumnFamily('Counters')->get('Rows', array('Users'));
+      $total = $numRows['Users'];
       // Create a paginator
       $pagination = new Pagination(array(
          'total_items' => $total,
@@ -59,6 +60,8 @@ class Controller_Useradmin_Admin_User extends Controller_App {
       $dir = isset($_GET['dir']) ? 'DESC' : 'ASC';
       $result = $user->limit($pagination->items_per_page)->offset($pagination->offset)->order_by($sort, $dir)
               ->find_all();
+
+      $user->get_range('');
 
       // render view
       // pass the paginator, result and default sorting direction
