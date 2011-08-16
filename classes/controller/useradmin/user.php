@@ -89,12 +89,12 @@ class Controller_Useradmin_User extends Controller_App {
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Edit user profile');
       $user = Auth::instance()->get_user();
-      $username = $user->username;
+      $username = $user['username'];
       // load the content from view
       $view = View::factory('user/profile_edit');
 
       // save the data
-      if ( !empty($_POST) && is_numeric($id) ) {
+      if ( !empty($_POST) ) {
          if(empty($_POST['password']) || empty($_POST['password_confirm'])) {
             // force unsetting the password! Otherwise Kohana3 will automatically hash the empty string - preventing logins
             unset($_POST['password'], $_POST['password_confirm']);
@@ -102,17 +102,14 @@ class Controller_Useradmin_User extends Controller_App {
 
          try {
 
-            $user->update_user($_POST, array(
-               'username',
-               'password',
-               'email',
-            ));
-            // message: save success
+		Model_User::update_user($_POST);
+
+		// message: save success
             Message::add('success', __('Values saved.'));
             // redirect and exit
             $this->request->redirect('user/profile');
             return;
-         } catch (ORM_Validation_Exception $e) {
+         } catch (Exception $e) {
             // Get errors for display in view
             // Note how the first param is the path to the message file (e.g. /messages/register.php)
             Message::add('error', __('Error: Values could not be saved.'));
@@ -121,19 +118,18 @@ class Controller_Useradmin_User extends Controller_App {
             $view->set('errors', $errors);
             // Pass on the old form values
             $user->password = '';
-            $view->set('data', $user->as_array());
+            $view->set('data', $user);
          }
       } else {
          // load the information for viewing
-         $view->set('data', $user->as_array());
+         $view->set('data', $user);
       }
       // retrieve roles into array
-      $roles = array();
-      foreach($user->roles->find_all() as $role) {
+     // $roles = array();
+      /*foreach($user->roles->find_all() as $role) {
           $roles[$role->name] = $role->description;
-       }
-      $view->set('user_roles', $roles);
-      $view->set('id', $id);
+       }*/
+     // $view->set('user_roles', $roles); 
       $this->template->content = $view;
 
    }
