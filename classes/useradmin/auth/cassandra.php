@@ -66,7 +66,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		try 
 		{
 			$model_User = new Model_User();
-			$model_User->create_user($fields, $fields['username']);
+			$model_User->create_user($fields);
 		} 
 		catch (ORM_Validation_Exception $e) 
 		{
@@ -89,23 +89,18 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 	{
 		if( ! is_array($users))
 			$users = array($users);
-		
+
+		$model_User = new Model_User();
+
 		foreach ($users as $user)
 		{
-			if($user instanceof Model_User) 
+			try
 			{
-				try 
-				{
-					$user->delete();
-				} 
-				catch (ORM_Validation_Exception $e) 
-				{
-					throw $e;
-				}
-			}
-			elseif( ! is_null($user) )
+				$model_User->delete_user($user);
+			} 
+			catch (Exception $e) 
 			{
-				throw new Kohana_Exception("Invalid argument, must be instance of Model_User or array() containing Model_User's");
+				throw $e;
 			}
 		}
 	}
