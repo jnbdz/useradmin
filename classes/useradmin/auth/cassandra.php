@@ -19,7 +19,11 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			$username = $user;
 
 			// Load the user
-			$user = CASSANDRA::selectColumnFamily('Users')->get($username);
+			$user_infos = CASSANDRA::selectColumnFamily('Users')->getIndexedSlices(array('username' => $username));
+			foreach($user_infos as $uuid => $cols) {
+				$cols['uuid'] = $uuid;
+				$user = $cols;
+			}
 		} else
 		{
 			$username = $user['username'];
@@ -36,17 +40,20 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		// Loads default driver before extend the results
 		$status = parent::_login($user, $password, $remember);
 
+		$uuid = $user['uuid'];
+		unset($user['uuid']);
+
 		if($status) 
 		{
 			// Successful login
 			// Reset the login failed count
 			$user['failed_login_count'] = 0;
-			CASSANDRA::selectColumnFamily('Users')->insert($username, $user);
+			CASSANDRA::selectColumnFamily('Users')->insert($uuid, $user);
 		} else {
 			// Failed login
 			$user['failed_login_count'] = $user['failed_login_count']+1;
 			$user['last_failed_login'] = date("Y-m-d H:i:s");
-			CASSANDRA::selectColumnFamily('Users')->insert($username, $user);
+			CASSANDRA::selectColumnFamily('Users')->insert($uuid, $user);
 		}
 
 		return $status;
