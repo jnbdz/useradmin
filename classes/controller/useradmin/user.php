@@ -102,13 +102,14 @@ class Controller_Useradmin_User extends Controller_App {
 
          try {
 
-		$result = Model_User::update_user($_POST);
+		$model_user = Model_User();
+		$model_user->update_user($_POST);
 
 		// message: save success
             Message::add('success', __('Values saved.'));
             // redirect and exit
             $this->request->redirect('user/profile');
-		throw new Exception($result);
+		//throw new Exception($result);
             return;
          } catch (Validation_Exception $e) {
             // Get errors for display in view
