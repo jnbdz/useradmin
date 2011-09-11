@@ -110,7 +110,7 @@ class Controller_Useradmin_User extends Controller_App {
             $this->request->redirect('user/profile');
 		throw new Exception($result);
             return;
-         } catch (Exception $e) {
+         } catch (Validation_Exception $e) {
             // Get errors for display in view
             // Note how the first param is the path to the message file (e.g. /messages/register.php)
             Message::add('error', __('Error: Values could not be saved.'));
