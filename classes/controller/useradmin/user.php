@@ -102,7 +102,7 @@ class Controller_Useradmin_User extends Controller_App {
 
          try {
 
-		$model_user = Model_User();
+		$model_user = new Model_User();
 		$model_user->update_user($_POST);
 
 		// message: save success
