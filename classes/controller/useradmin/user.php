@@ -214,8 +214,7 @@ class Controller_Useradmin_User extends Controller_App {
       }
       // get the user id
       $uuid = Auth::instance()->get_user()->uuid;
-var_dump($uuid);
-die($uuid);
+
       // check for confirmation
       if($uuid && isset($_POST['confirmation']) && $_POST['confirmation'] == 'Y') {
          if (Auth::instance()->logged_in()) {
