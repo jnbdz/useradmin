@@ -229,7 +229,7 @@ class Controller_Useradmin_User extends Controller_App {
          $this->request->redirect('user/profile');
       }
       // display confirmation
-      $this->template->content = View::factory('user/unregister')->set('id', $uuid)->set('data', array('username' => Auth::instance()->get_user()->username));
+      $this->template->content = View::factory('user/unregister')->set('id', CASSANDRA::Util()->import($uuid))->set('data', array('username' => Auth::instance()->get_user()->username));
    }
 
    /**
