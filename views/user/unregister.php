@@ -4,7 +4,7 @@
 <?php
 
 echo Form::open('user/unregister/'.$id, array('style' => 'display: inline;'));
-die($id);
+
 echo Form::hidden('id', $id);
 
 echo '<p>Are you sure you want to remove your user account?</p>';
