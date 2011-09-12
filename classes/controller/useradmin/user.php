@@ -213,29 +213,23 @@ class Controller_Useradmin_User extends Controller_App {
          $this->request->redirect('user/login');
       }
       // get the user id
-      $id = Auth::instance()->get_user()->id;
-      $user = ORM::factory('user', $id);
-      // KO3 ORM is lazy loading, which means we have to access a single field to actually have something happen.
-      if($user->id != $id) {
-         // If the user is not the current user, redirect
-         $this->request->redirect('user/profile');
-      }
+      $uuid = Auth::instance()->get_user()->uuid;
+
       // check for confirmation
-      if(is_numeric($id) && isset($_POST['confirmation']) && $_POST['confirmation'] == 'Y') {
+      if($uuid && isset($_POST['confirmation']) && $_POST['confirmation'] == 'Y') {
          if (Auth::instance()->logged_in()) {
             // Log the user out, their account will no longer exist
             Auth::instance()->logout();
          }
          // Delete the user
-         $user->delete($id);
-         // Delete any associated identities
-         DB::delete('user_identity')->where('user_id', '=', $id)->execute();
+	 $model_user = new Model_User();
+	 $model_user->delete_user($uuid); 
          // message: save success
          Message::add('success', __('User deleted.'));
          $this->request->redirect('user/profile');
       }
       // display confirmation
-      $this->template->content = View::factory('user/unregister')->set('id', $id)->set('data', array('username' => Auth::instance()->get_user()->username));
+      $this->template->content = View::factory('user/unregister')->set('id', $uuid)->set('data', array('username' => Auth::instance()->get_user()->username));
    }
 
    /**
