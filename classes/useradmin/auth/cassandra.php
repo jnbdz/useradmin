@@ -30,6 +30,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			CASSANDRA::selectColumnFamily('Users');
 			$user_infos = CASSANDRA::getIndexedSlices(array($col => $username));
 			foreach($user_infos as $uuid => $cols) {
+				echo $uuid;
 				$cols['uuid'] = $uuid;
 				$user = $cols;
 			}
