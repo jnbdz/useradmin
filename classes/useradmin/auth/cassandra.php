@@ -62,7 +62,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			// Failed login
 			CASSANDRA::selectColumnFamily('Users')->insert($uuid, array(
 											'failed_login_count' => $user['failed_login_count']+1,
-											'last_failed_login' => date("Y-m-d H:i:s")
+											'last_failed_login' => date('YmdHis', time()),
 											));
 		}
 
