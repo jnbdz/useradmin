@@ -37,6 +37,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 					$user = FALSE;
 				}
 			}
+			die(var_dump($user));
 		} else
 		{
 			$username = $user['username'];
