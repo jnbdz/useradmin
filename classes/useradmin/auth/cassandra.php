@@ -17,6 +17,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		if ( ! is_array($user))
 		{
 			$username = $user;
+			$user = FALSE;
 
 			$pos = strrpos($username, '@');
 
@@ -30,15 +31,9 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			CASSANDRA::selectColumnFamily('Users');
 			$user_infos = CASSANDRA::getIndexedSlices(array($col => $username));
 			foreach($user_infos as $uuid => $cols) {
-die(var_dump($uuid));
-				if ($uuid) {
-					$cols['uuid'] = $uuid;
-					$user = $cols;
-				} else {
-					$user = FALSE;
-				}
+				$cols['uuid'] = $uuid;
+				$user = $cols;
 			}
-			die(var_dump($user));
 		} else
 		{
 			$username = $user['username'];
@@ -50,7 +45,7 @@ die(var_dump($uuid));
 			// do nothing, and fail (too many failed logins within {login_jail_time} minutes).
 			return FALSE;
 		}
-die(var_dump($user));
+
 		if ($user) {
 			$user['username'] = $username;
 			// Loads default driver before extend the results
