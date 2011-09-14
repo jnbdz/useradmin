@@ -33,7 +33,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 				$cols['uuid'] = $uuid;
 				$user = $cols;
 			}
-echo 'TRUE';
+echo var_dump($user);
 		} else
 		{
 			$username = $user['username'];
