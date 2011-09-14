@@ -30,11 +30,13 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			CASSANDRA::selectColumnFamily('Users');
 			$user_infos = CASSANDRA::getIndexedSlices(array($col => $username));
 			foreach($user_infos as $uuid => $cols) {
-				echo $uuid;
-				$cols['uuid'] = $uuid;
-				$user = $cols;
+				if ($uuid) {
+					$cols['uuid'] = $uuid;
+					$user = $cols;
+				} else {
+					$user = FALSE;
+				}
 			}
-echo var_dump($user);
 		} else
 		{
 			$username = $user['username'];
@@ -47,18 +49,20 @@ echo var_dump($user);
 			return FALSE;
 		}
 
-		$user['username'] = $username;
-		// Loads default driver before extend the results
-		$status = parent::_login($user, $password, $remember);
-echo $user['username'];
-echo '<br/>';
-die(var_dump($user));
+		if ($user) {
+			$user['username'] = $username;
+			// Loads default driver before extend the results
+			$status = parent::_login($user, $password, $remember);
+		} else {
+			$status = FALSE;
+		}
+
 		if($status) 
 		{
 			// Successful login
 			// Reset the login failed count	
 			CASSANDRA::selectColumnFamily('Users')->insert($user['uuid'], array('failed_login_count' => 0));
-		} elseif (!empty($user['uuid'])) {
+		} elseif ($user) {
 			// Failed login
 			CASSANDRA::selectColumnFamily('Users')->insert($user['uuid'], array(
 											'failed_login_count' => $user['failed_login_count']+1,
