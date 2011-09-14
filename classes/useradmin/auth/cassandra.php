@@ -51,7 +51,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 
 		$uuid = $user['uuid'];
 
-		die(var_dump($user));
+//		die(var_dump($user));
 
 		if($status) 
 		{
