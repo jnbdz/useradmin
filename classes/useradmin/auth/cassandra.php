@@ -17,7 +17,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		if ( ! is_array($user))
 		{	
 
-			$cols = (Valid::email($user)) ? 'email' : 'username';
+			$col = (Valid::email($user)) ? 'email' : 'username';
 
 			// Load the user
 			CASSANDRA::selectColumnFamily('Users');
