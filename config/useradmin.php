@@ -77,4 +77,13 @@ return array(
      * - You must set the private and public key in /config/recaptcha.php from https://www.google.com/recaptcha/admin/create
      */
     'captcha' => false,
+    /**
+     * Activation code is used when you want to limit who can subscribe to your website.
+     *
+     * Setup
+     * - Nothing really.
+     */
+    'activation_code' => false,
+    /* Who can invite new users using roles */
+    'activation_code_invitations' => 'admin',
     );
