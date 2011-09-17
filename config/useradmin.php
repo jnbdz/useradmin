@@ -85,5 +85,7 @@ return array(
      */
     'activation_code' => false,
     /* Who can invite new users using roles */
-    'activation_code_invitations' => 'admin',
+    'activation_code_user_role' => 'admin',
+    /* Limit of new users can be invite by a user */
+    'activation_code_limit' => 0,
     );
