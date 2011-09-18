@@ -27,9 +27,13 @@ echo $form->open('user/register');
    <li><label><?php echo __('Email address'); ?></label></li>
    <?php echo $form->input('email') ?>
    <li><label><?php echo __('Password'); ?></label></li>
-   <?php echo $form->password('password', null, array('info' => __('Password should be between 6-42 characters.'))) ?>
+   <?php echo $form->password('password', null, array('info' => __('Password should be between 6-42 characters.'))); ?>
    <li><label><?php echo __('Re-type Password'); ?></label></li>
    <?php echo $form->password('password_confirm') ?>
+   <?php if (isset($activation_code_enabled) && $activation_code_enabled) { ?>
+   	<li><label><?php echo __('Activation Code'); ?></label></li>
+   	<?php echo $form->input('activation_code', null, array('info' => __('You need your activation code to be able to register.'))); ?>
+   <?php } ?>
    <?php if(isset($captcha_enabled) && $captcha_enabled) { ?>
    <li>
        <?php echo $recaptcha_html; ?>
