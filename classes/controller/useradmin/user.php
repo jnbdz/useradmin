@@ -140,6 +140,10 @@ class Controller_Useradmin_User extends Controller_App {
     * Register a new user.
     */
    public function action_register() {
+      // Load Activation code if needed
+      if (Kohana::config('useradmin')->activation_code) {
+      	$activation_code_config = Kohana::config('useradmin');
+      }
       // Load reCaptcha if needed
       if(Kohana::config('useradmin')->captcha) {
          include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
@@ -176,6 +180,7 @@ class Controller_Useradmin_User extends Controller_App {
             if( ! $optional_checks ) {
                //throw new ORM_Validation_Exception("Invalid option checks");
             }
+
             Auth::instance()->register( $_POST );
 
             // sign the user in
@@ -183,7 +188,7 @@ class Controller_Useradmin_User extends Controller_App {
 
             // redirect to the user account
             $this->request->redirect('user/profile');
-         } catch (ORM_Validation_Exception $e) {
+         } catch (Validation_Exception $e) {
             // Get errors for display in view
             // Note how the first param is the path to the message file (e.g. /messages/register.php)
             $errors = $e->errors('register');
@@ -194,6 +199,9 @@ class Controller_Useradmin_User extends Controller_App {
             $_POST['password'] = $_POST['password_confirm'] = '';
             $view->set('defaults', $_POST);
          }
+      }
+      if(Kohana::config('useradmin')->activation_code) {
+	$view->set('activation_code_enabled', true);
       }
       if(Kohana::config('useradmin')->captcha) {
          $view->set('captcha_enabled', true);
@@ -320,9 +328,14 @@ class Controller_Useradmin_User extends Controller_App {
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Forgot password');
       if(isset($_POST['reset_email'])) {
-         $user = ORM::factory('user')->where('email', '=', $_POST['reset_email'])->find();
+	 CASSANDRA::selectColumnFamily('Users');
+	 $user = CASSANDRA::getIndexedSlices(array('email' => $_POST['reset_email']));
+	 foreach($user_infos as $uuid => $cols) {
+		$cols['uuid'] = $uuid;
+		$user = $cols;
+	 }
          // admin passwords cannot be reset by email
-         if (is_numeric($user->id) && ($user->username != 'admin')) {
+         if ($user['uuid'] && ($user['username'] != 'admin')) {
             // send an email with the account reset token
             $user->reset_token = $user->generate_password(32);
             $user->save();
