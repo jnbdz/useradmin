@@ -140,10 +140,6 @@ class Controller_Useradmin_User extends Controller_App {
     * Register a new user.
     */
    public function action_register() {
-      // Load Activation code if needed
-      if (Kohana::config('useradmin')->activation_code) {
-      	$activation_code_config = Kohana::config('useradmin');
-      }
       // Load reCaptcha if needed
       if(Kohana::config('useradmin')->captcha) {
          include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
@@ -181,7 +177,31 @@ class Controller_Useradmin_User extends Controller_App {
                //throw new ORM_Validation_Exception("Invalid option checks");
             }
 
+	    $_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+
             Auth::instance()->register( $_POST );
+
+	    $message = "Thank you so much for registering with :title!\n\n"
+			."Please confirm your :title account by clicking this link:\n\n"
+			.":websitelink/confirm_email/:email_code\n\n"
+			."Once you confirm, you will have full access to :title and all future notifications will be sent to this email address.\n\n"
+			."The :title Team";
+
+	    $mailer = Email::connect();
+	    $to = array($_POST['email']);
+	    $from = array('no-reply@yaloub.com');
+	    $subject = __('Confirm your subscription.');
+	    $body = __($message, array(
+					':title'	=> Kohana::config('useradmin')->title,
+					':websitelink'	=> URL::base(),
+					':email_code'	=> $_POST['email_code'],
+				));
+
+	    $message_swift = Swift_Message::newInstance($subject, $body)
+							->setFrom($from)
+							->setTo($to);
+
+	    $mailer->send($message_swift);
 
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
