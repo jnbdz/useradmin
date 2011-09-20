@@ -303,10 +303,10 @@ class Controller_Useradmin_User extends Controller_App {
     */
    private function send_email_conformation($fields)
    {
-            $message = "Thank you so much for registering with :title!\n\n"
-                       ."Please confirm your :title account by clicking this link:\n\n"
-                       .":websitelink/confirm_email/:email_code\n\n"
-                       ."Once you confirm, you will have full access to :title and all future notifications will be sent to this email address.\n\n"
+            $message = "Thank you so much for registering with :title!<br>\n\n"
+                       ."Please confirm your :title account by clicking this link:<br>\n\n"
+                       .":email_code_address<br>\n\n"
+                       ."Once you confirm, you will have full access to :title and all future notifications will be sent to this email address.<br>\n\n"
                        ."The :title Team";
 
             $mailer = Email::connect();
@@ -315,11 +315,10 @@ class Controller_Useradmin_User extends Controller_App {
             $subject = __('Confirm your subscription.');
             $body = __($message, array(
                                         ':title'        => Kohana::config('useradmin')->title,
-                                        ':websitelink'  => URL::base(),
-                                        ':email_code'   => $fields['email_code'],
+                                        ':email_code_address'  => HTML::anchor('/user/confirm_email/'.$fields['email_code'], URL::base().'user/confirm_email/'.$fields['email_code']),
                                 ));
 
-            $message_swift = Swift_Message::newInstance($subject, $body)
+            $message_swift = Swift_Message::newInstance($subject, $body, "text/html")
                                                         ->setFrom($from)
                                                         ->setTo($to);
 
