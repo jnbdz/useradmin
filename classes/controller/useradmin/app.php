@@ -132,7 +132,7 @@ class Controller_Useradmin_App extends Controller {
    public function after() {
       if ($this->auto_render === TRUE) {
 
-	 if(Auth::instance()->logged_in() && Auth::instance()->get_user()->email_verified !== 'true')
+	 if(Auth::instance()->logged_in() && Auth::instance()->get_user()->email_verified != 'true')
 	 {
 		Message::add('error', __('You need to confirm your email. Resend :confirmation_email.', array(
 						':confirmation_email'   => HTML::anchor('/user/send_confirmation_email/', __('confirmation email')),
