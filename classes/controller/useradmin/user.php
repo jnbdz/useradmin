@@ -223,6 +223,11 @@ class Controller_Useradmin_User extends Controller_App {
 		$this->request->redirect('user/login');
 	}
 
+	if(Auth::instance()->get_user()->email_verified === 'true')
+	{
+		$this->request->redirect('user/profile');
+	}
+
 	$fields['email_code'] = Auth::instance()->get_user()->email_verified;
 	$fields['email'] = Auth::instance()->get_user()->email;
 
@@ -256,17 +261,33 @@ class Controller_Useradmin_User extends Controller_App {
 		$this->request->redirect('user/login');
 	}
 
+	if(Auth::instance()->get_user()->email_verified === 'true')
+	{
+		// This is for avoiding confusion on the part of the user
+		// Send this message to ind. to the user that they do not need to confirm the email anymore
+		Message::add('success', __('Success! Your email as been confirmed.'));
+		$this->request->redirect('user/profile');
+	}
+
 	try
 	{
-		new Model_User;
-		$email_code['email_confirmation_code'] = $email_code;
-		Validation::factory($email_code)
+		// Get the model where the validation method is and the method for updating the status of the email_verified is
+		$model_user = new Model_User;
+		// Create an array for the Validation Class
+		$email_confirmation_code = array();
+		$email_confirmation_code['email_confirmation_code'] = $email_code;
+		Validation::factory($email_confirmation_code)
 			->rule('email_confirmation_code', 'email_confirmation_code', array($this, ':field'));
+		// Update email_verified
+		$model_user->update_email_confirmation();
+		// Send a message to the user that the code was accepted
 		Message::add('success', __('Success! Your email as been confirmed.'));
+		// Redirect to the profile page where the message will be read by the user
 		$this->request->redirect('user/profile');
 	}
 	catch (Validation_Exception $e)
 	{
+		// Send an error message to the user
 		Message::add('error', __('The code given was wrong or as expired.'));
 		$this->request->redirect('user/profile');
 	}
