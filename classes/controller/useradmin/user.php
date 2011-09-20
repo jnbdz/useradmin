@@ -181,27 +181,7 @@ class Controller_Useradmin_User extends Controller_App {
 
             Auth::instance()->register( $_POST );
 
-	    $message = "Thank you so much for registering with :title!\n\n"
-			."Please confirm your :title account by clicking this link:\n\n"
-			.":websitelink/confirm_email/:email_code\n\n"
-			."Once you confirm, you will have full access to :title and all future notifications will be sent to this email address.\n\n"
-			."The :title Team";
-
-	    $mailer = Email::connect();
-	    $to = array($_POST['email']);
-	    $from = array('no-reply@yaloub.com');
-	    $subject = __('Confirm your subscription.');
-	    $body = __($message, array(
-					':title'	=> Kohana::config('useradmin')->title,
-					':websitelink'	=> URL::base(),
-					':email_code'	=> $_POST['email_code'],
-				));
-
-	    $message_swift = Swift_Message::newInstance($subject, $body)
-							->setFrom($from)
-							->setTo($to);
-
-	    $mailer->send($message_swift);
+	    $this->send_email_conformation($_POST);
 
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
@@ -228,6 +208,101 @@ class Controller_Useradmin_User extends Controller_App {
          $view->set('recaptcha_html', recaptcha_get_html($recaptcha_config['publickey'], $recaptcha_error));
       }
       $this->template->content = $view;
+   }
+
+   /**
+    * Action to resend email
+    */
+   public function action_send_confirmation_email()
+   {
+	// set the template title (see Controller_App for implementation)
+	$this->template->title = __('Sending confirmation email');
+	if ( Auth::instance()->logged_in() == false )
+	{
+		// No user is currently logged in
+		$this->request->redirect('user/login');
+	}
+
+	$fields['email_code'] = Auth::instance()->get_user()->email_verified;
+	$fields['email'] = Auth::instance()->get_user()->email;
+
+	try
+	{
+		if(!$this->send_confirmation_email($fields))
+		{
+			throw Exception(__('The email could not be send. Try again later.'));
+		}
+		Message::add('success', __('A new code was send to you.'));
+		$this->request->redirect('user/profile');
+	}
+	catch (Exception $e)
+	{
+		Message::add('error', __('The email could not be send. Try again later.'));
+		Log::add(Log::ERROR, 'Confirmation email could not be send.');
+		$this->request->redirect('user/profile');
+	}
+
+   }
+
+   /**
+    * Email confirmation
+    */
+   public function action_confirm_email($email_code) {
+	// set the template title (see Controller_App for implementation)
+	$this->template->title = __('Account confirmation');
+	if ( Auth::instance()->logged_in() == false )
+	{
+		// No user is currently logged in
+		$this->request->redirect('user/login');
+	}
+
+	try
+	{
+		new Model_User;
+		$email_code['email_confirmation_code'] = $email_code;
+		Validation::factory($email_code)
+			->rule('email_confirmation_code', 'email_confirmation_code', array($this, ':field'));
+		Message::add('success', __('Success! Your email as been confirmed.'));
+		$this->request->redirect('user/profile');
+	}
+	catch (Validation_Exception $e)
+	{
+		Message::add('error', __('The code given was wrong or as expired.'));
+		$this->request->redirect('user/profile');
+	}
+
+	$this->template->content = $view;
+   }
+
+   /**
+    * Email confirmation sender
+    *
+    * @param Array Field Name
+    * @return Bool
+    */
+   private function send_email_conformation($fields)
+   {
+            $message = "Thank you so much for registering with :title!\n\n"
+                       ."Please confirm your :title account by clicking this link:\n\n"
+                       .":websitelink/confirm_email/:email_code\n\n"
+                       ."Once you confirm, you will have full access to :title and all future notifications will be sent to this email address.\n\n"
+                       ."The :title Team";
+
+            $mailer = Email::connect();
+            $to = array($fields['email']);
+            $from = array(Kohana::config('useradmin')->email_address);
+            $subject = __('Confirm your subscription.');
+            $body = __($message, array(
+                                        ':title'        => Kohana::config('useradmin')->title,
+                                        ':websitelink'  => URL::base(),
+                                        ':email_code'   => $fields['email_code'],
+                                ));
+
+            $message_swift = Swift_Message::newInstance($subject, $body)
+                                                        ->setFrom($from)
+                                                        ->setTo($to);
+
+            return $mailer->send($message_swift);
    }
 
    /**
