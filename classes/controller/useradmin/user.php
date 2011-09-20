@@ -301,7 +301,7 @@ class Controller_Useradmin_User extends Controller_App {
     * @param Array Field Name
     * @return Bool
     */
-   private function send_email_conformation($fields)
+   private function send_confirmation_email($fields)
    {
             $message = "Thank you so much for registering with :title!<br>\n\n"
                        ."Please confirm your :title account by clicking this link:<br>\n\n"
