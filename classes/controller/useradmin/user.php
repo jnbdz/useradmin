@@ -1,4 +1,4 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * User controller: user administration, also user accounts/profiles.
