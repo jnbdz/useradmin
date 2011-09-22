@@ -103,7 +103,17 @@ class Controller_Useradmin_User extends Controller_App {
          try {
 
 		$model_user = new Model_User();
+
+		$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+
+		$send_email = (Auth::instance()->get_user() === $_POST['email']) ? FALSE : TRUE;
+
 		$model_user->update_user($_POST);
+
+		if($send_email)
+		{
+			$model_user->send_confirmation_email($_POST);
+		}
 
 		// message: save success
             Message::add('success', __('Values saved.'));
@@ -181,7 +191,7 @@ class Controller_Useradmin_User extends Controller_App {
 
             Auth::instance()->register( $_POST );
 
-	    $this->send_email_conformation($_POST);
+	    $this->send_conformation_email($_POST);
 
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
