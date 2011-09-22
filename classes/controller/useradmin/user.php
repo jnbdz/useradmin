@@ -104,9 +104,16 @@ class Controller_Useradmin_User extends Controller_App {
 
 		$model_user = new Model_User();
 
-		$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
-
-		$send_email = (Auth::instance()->get_user() === $_POST['email']) ? FALSE : TRUE;
+		if(Auth::instance()->get_user() === $_POST['email'])
+		{
+			$send_email = FALSE;
+			$_POST['email_code'] = FALSE;
+		}
+		else
+		{
+			$send_email = TRUE;
+			$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+		}
 
 		$model_user->update_user($_POST);
 
