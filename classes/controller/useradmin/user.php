@@ -398,8 +398,7 @@ class Controller_Useradmin_User extends Controller_App {
          // set the template title (see Controller_App for implementation)
          $this->template->title = __('Login');
          // If user already signed-in
-         if(Auth::instance()->logged_in() != 0){
-		die('logged_in = true');
+         if(Auth::instance()->logged_in() != 0){	
             // redirect to the user account
             $this->request->redirect('user/profile');
          }
