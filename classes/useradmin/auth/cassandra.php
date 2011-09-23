@@ -23,9 +23,18 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			CASSANDRA::selectColumnFamily('Users');
 			$user_infos = CASSANDRA::getIndexedSlices(array($col => $user));
 			$user = FALSE;
+			$i=0;
 			foreach($user_infos as $uuid => $cols) {
 				$cols['uuid'] = $uuid;
 				$user = $cols;
+				if($i === 1)
+				{
+					$this->request->redirect('error/conflic');
+					Log::add(Log::ERROR, 'There was a conflic with the username and/or email. '.var_dump($user));
+					break;
+					return;
+				}
+				$i++;
 			}
 		}
 
