@@ -104,7 +104,7 @@ class Controller_Useradmin_User extends Controller_App {
 
 		$model_user = new Model_User();
 
-		if(Auth::instance()->get_user() === $_POST['email'])
+		if(Auth::instance()->get_user()->email === $_POST['email'])
 		{
 			$send_email = FALSE;
 			$_POST['email_code'] = 'true';
