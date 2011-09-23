@@ -107,7 +107,7 @@ class Controller_Useradmin_User extends Controller_App {
 		if(Auth::instance()->get_user() === $_POST['email'])
 		{
 			$send_email = FALSE;
-			$_POST['email_code'] = FALSE;
+			$_POST['email_code'] = 'true';
 		}
 		else
 		{
