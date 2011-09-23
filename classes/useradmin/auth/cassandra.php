@@ -31,7 +31,8 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 				{	
 					$log->add(Log::ERROR, 'There was a conflic with the username and/or email. UUID: '.$user['uuid'].' username: '.$user['username'].' email: '.$user['email']);
 					$this->request->redirect('error/conflic');
-					return;
+					$user = FALSE;
+					break;
 				}
 				$i++;
 			}
