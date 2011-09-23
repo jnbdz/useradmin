@@ -119,7 +119,7 @@ class Controller_Useradmin_User extends Controller_App {
 
 		if($send_email)
 		{
-			$model_user->send_confirmation_email($_POST);
+			$this->send_confirmation_email($_POST);
 		}
 
 		// message: save success
