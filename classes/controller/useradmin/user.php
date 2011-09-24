@@ -260,7 +260,7 @@ class Controller_Useradmin_User extends Controller_App {
 	catch (Exception $e)
 	{
 		Message::add('error', __('The email could not be send. Try again later.'));
-		Kohana::$log::add(Log::ERROR, 'Confirmation email could not be send.');
+		Kohana::$log->add(Log::ERROR, 'Confirmation email could not be send.');
 		$this->request->redirect('user/profile');
 	}
 
