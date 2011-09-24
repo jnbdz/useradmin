@@ -198,7 +198,7 @@ class Controller_Useradmin_User extends Controller_App {
 
             Auth::instance()->register( $_POST );
 
-	    $this->send_conformation_email($_POST);
+	    $this->send_confirmation_email($_POST);
 
             // sign the user in
             Auth::instance()->login($_POST['username'], $_POST['password']);
@@ -260,7 +260,7 @@ class Controller_Useradmin_User extends Controller_App {
 	catch (Exception $e)
 	{
 		Message::add('error', __('The email could not be send. Try again later.'));
-		Log::add(Log::ERROR, 'Confirmation email could not be send.');
+		Kohana::$log::add(Log::ERROR, 'Confirmation email could not be send.');
 		$this->request->redirect('user/profile');
 	}
 
