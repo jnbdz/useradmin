@@ -85,7 +85,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 	{
 		try 
 		{
-			$model_User = new Model_User();
+			$model_User = new Model_User;
 			$model_User->create_user($fields);
 		} 
 		catch (Validation_Exception $e) 
