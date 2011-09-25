@@ -196,7 +196,7 @@ class Controller_Useradmin_User extends Controller_App {
 
 	    $_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
 
-	    Auth::instance()->register( $_POST );
+	    Auth::instance()->register( $bob );
 
 	    $this->send_confirmation_email($_POST); 
 
