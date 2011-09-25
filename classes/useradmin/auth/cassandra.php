@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct access allowed.');
 /**
- * ORM Auth driver extended for Useradmin module support.
+ * CASSANDRA Auth driver extended for Useradmin module support.
  *
  * @package    Useradmin/Auth
  * @author     Gabriel R. Giannattasio
@@ -8,8 +8,8 @@
 class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmin_Driver_iAuth {
 
 	/**
-	 * Extends the Kohana Auth ORM driver to give useradmin module extras
-	 * @see Kohana_Auth_ORM::_login()
+	 * Extends the Kohana Auth CASSANDRA driver to give useradmin module extras
+	 * @see Kohana_Auth_CASSANDRA::_login()
 	 */
 	protected function _login($user, $password, $remember) 
 	{
@@ -88,7 +88,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			$model_User = new Model_User();
 			$model_User->create_user($fields);
 		} 
-		catch (ORM_Validation_Exception $e) 
+		catch (Validation_Exception $e) 
 		{
 			throw $e;
 			return FALSE;
