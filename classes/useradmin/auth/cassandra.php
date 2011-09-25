@@ -90,6 +90,8 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		} 
 		catch (Validation_Exception $e) 
 		{
+			echo var_dump($e);
+			die('dead!');
 			throw $e;
 			return FALSE;
 		}
