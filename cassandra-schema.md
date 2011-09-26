@@ -1,6 +1,18 @@
 Cassandra-Schema
 =============
 
+##Configuration
+
+Change the driver value in auth.php configuration file to cassandra.
+
+##Need Cassandra Module
+
+Got to: https://github.com/jnbdz/Kohana-Cassandra to get the Koahana-Cassandra module.
+
+##Don't forget
+
+Do not forget to follow the instructions to how to install Cassandra/Thrift/PHPCassa in the README.md file of Kohana-Cassandra.
+
 ##Connect to Cassandra
 
 `bin/cassandra-cli -host localhost -port 9160`
