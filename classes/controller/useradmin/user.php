@@ -23,6 +23,12 @@ class Controller_Useradmin_User extends Controller_App {
     * Can be set to a string or an array, for example array('login', 'admin') or 'login'
     */
    public $auth_required = FALSE;
+   
+   /**
+    * ReCaptcha variables that are all private. So that no other code as access to the ReCaptcha keys.
+    */
+   private $recaptcha_config = NULL;
+   private $recaptcha_error = NULL;
 
    /** Controls access for separate actions
     *
@@ -43,11 +49,14 @@ class Controller_Useradmin_User extends Controller_App {
       // logout is also public to avoid confusion (e.g. easier to specify and test post-logout page)
       );
 
+    /**
+     * Load ReCaptcha configurations and vendor code.
+     */
     public function loadReCaptcha() {
     	if(Kohana::config('useradmin')->captcha) {
         	include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
-        	$recaptcha_config = Kohana::config('recaptcha');
-        	$recaptcha_error = null;
+        	$this->recaptcha_config = Kohana::config('recaptcha');
+        	$this->recaptcha_error = null;
       }
     }
 
@@ -182,13 +191,13 @@ class Controller_Useradmin_User extends Controller_App {
          $optional_checks = true;
          // if configured to use captcha, check the reCaptcha result
          if(Kohana::config('useradmin')->captcha) {
-            $recaptcha_resp = recaptcha_check_answer($recaptcha_config['privatekey'],
+            $recaptcha_resp = recaptcha_check_answer($this->recaptcha_config['privatekey'],
                                            $_SERVER['REMOTE_ADDR'],
                                            $_POST['recaptcha_challenge_field'],
                                            $_POST['recaptcha_response_field']);
             if(!$recaptcha_resp->is_valid) {
                $optional_checks = false;
-               $recaptcha_error = $recaptcha_resp->error;
+               $this->recaptcha_error = $recaptcha_resp->error;
                Message::add('error', __('The captcha text is incorrect, please try again.'));
             }
          }
@@ -228,7 +237,7 @@ class Controller_Useradmin_User extends Controller_App {
       }
       if(Kohana::config('useradmin')->captcha) {
          $view->set('captcha_enabled', true);
-         $view->set('recaptcha_html', recaptcha_get_html($recaptcha_config['publickey'], $recaptcha_error));
+         $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
       }
       $this->template->content = $view;
    }
@@ -763,10 +772,10 @@ class Controller_Useradmin_User extends Controller_App {
                $view->set('defaults', $values);
                if(Kohana::config('useradmin')->captcha) {
                   include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
-                  $recaptcha_config = Kohana::config('recaptcha');
-                  $recaptcha_error = null;
+                  $this->recaptcha_config = Kohana::config('recaptcha');
+                  $this->recaptcha_error = null;
                   $view->set('captcha_enabled', true);
-                  $view->set('recaptcha_html', recaptcha_get_html($recaptcha_config['publickey'], $recaptcha_error));
+                  $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
                }
                $this->template->content = $view;
             }
