@@ -43,6 +43,14 @@ class Controller_Useradmin_User extends Controller_App {
       // logout is also public to avoid confusion (e.g. easier to specify and test post-logout page)
       );
 
+    public function loadReCaptcha() {
+    	if(Kohana::config('useradmin')->captcha) {
+        	include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
+        	$recaptcha_config = Kohana::config('recaptcha');
+        	$recaptcha_error = null;
+      }
+    }
+
    // USER SELF-MANAGEMENT
 
    /**
@@ -158,11 +166,7 @@ class Controller_Useradmin_User extends Controller_App {
     */
    public function action_register() {
       // Load reCaptcha if needed
-      if(Kohana::config('useradmin')->captcha) {
-         include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
-         $recaptcha_config = Kohana::config('recaptcha');
-         $recaptcha_error = null;
-      }
+      $this->loadReCaptcha();
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('User registration');
       // If user already signed-in
