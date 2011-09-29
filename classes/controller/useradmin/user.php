@@ -229,62 +229,62 @@ class Controller_Useradmin_User extends Controller_App {
       $view = View::factory('user/register');
       // If there is a post and $_POST is not empty
       if ($_POST) {
-         // optional checks (e.g. reCaptcha or some other additional check)
-         $optional_checks = true;
-         // if configured to use captcha, check the reCaptcha result
-         if(Kohana::config('useradmin')->captcha)
-	 {
-            $recaptcha_resp = recaptcha_check_answer($this->recaptcha_config['privatekey'],
-                                           $_SERVER['REMOTE_ADDR'],
-                                           $_POST['recaptcha_challenge_field'],
-                                           $_POST['recaptcha_response_field']);
-
-		if(!$recaptcha_resp->is_valid)
+		// optional checks (e.g. reCaptcha or some other additional check)
+		$optional_checks = true;
+		// if configured to use captcha, check the reCaptcha result
+		if(Kohana::config('useradmin')->captcha)
 		{
-			$optional_checks = false;
-			$this->recaptcha_error = $recaptcha_resp->error;
-			Message::add('error', __('The captcha text is incorrect, please try again.'));
+			$recaptcha_resp = recaptcha_check_answer($this->recaptcha_config['privatekey'],
+						$_SERVER['REMOTE_ADDR'],
+						$_POST['recaptcha_challenge_field'],
+						$_POST['recaptcha_response_field']);
+
+			if(!$recaptcha_resp->is_valid)
+			{
+				$optional_checks = false;
+				$this->recaptcha_error = $recaptcha_resp->error;
+				Message::add('error', __('The captcha text is incorrect, please try again.'));
+			}
 		}
-         }
 
-	$user = Model::factory('user');
+		$user = Model::factory('user');
 
-	$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+		$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
 
-	$post = Validation::factory($_POST)
-			->rules('username', $this->_rules['username'])
-			->rule('username', array($user, 'username_available'), array(':validation', ':field'))
-			->rules('email', $this->_rules['email'])
-			->rule('email', array($user, 'email_available'), array(':validation', ':field'))
-			->rules('password', $this->_rules['password'])
-			->rules('password_confirm', $this->_rules['password_confirm']);
+		$post = Validation::factory($_POST)
+				->rules('username', $this->_rules['username'])
+				->rule('username', array($user, 'username_available'), array(':validation', ':field'))
+				->rules('email', $this->_rules['email'])
+				->rule('email', array($user, 'email_available'), array(':validation', ':field'))
+				->rules('password', $this->_rules['password'])
+				->rules('password_confirm', $this->_rules['password_confirm']);
 
-	if(Kohana::config('useradmin')->activation_code)
-	{
-		$post->rule('activation_code', array($this, 'check_activation_code'), array(':validation', ':field'));
-	}
+		if(Kohana::config('useradmin')->activation_code)
+		{
+			$post->rule('activation_code', array($this, 'check_activation_code'), array(':validation', ':field'));
+		}
 
-	if($post->check() && $optional_checks)
-	{
-		$user->create_user($post);
-		$this->send_confirmation_email($post);
-		// Send Welcome Email
-		// sign the user in
-		Auth::instance()->login($_POST['username'], $_POST['password']);
-		// redirect to the user account
-		$this->request->redirect('user/profile');
-	}
+		if($post->check() && $optional_checks)
+		{
+			$user->create_user($post);
+			$this->send_confirmation_email($post);
+			// Send Welcome Email
+			// sign the user in
+			Auth::instance()->login($_POST['username'], $_POST['password']);
+			// redirect to the user account
+			$this->request->redirect('user/profile');
+		}
 
-	// Validation failed, collect the errors
-	$errors = $post->errors('register/user');
+		// Validation failed, collect the errors
+		$errors = $post->errors('register/user');
 
-	// Move external errors to main array, for post helper compatibility
-	$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
-	$view->set('errors', $errors);
-	// Pass on the old form values
-	$_POST['password'] = $_POST['password_confirm'] = '';
-	$view->set('defaults', $_POST);
-
+		// Move external errors to main array, for post helper compatibility
+		$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
+		$view->set('errors', $errors);
+		// Pass on the old form values
+		$_POST['password'] = $_POST['password_confirm'] = '';
+		$view->set('defaults', $_POST);
+	} // End of if $_POST
 	if(Kohana::config('useradmin')->activation_code)
 	{
 		$view->set('activation_code_enabled', true);
