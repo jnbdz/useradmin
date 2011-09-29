@@ -190,16 +190,19 @@ class Controller_Useradmin_User extends Controller_App {
          // optional checks (e.g. reCaptcha or some other additional check)
          $optional_checks = true;
          // if configured to use captcha, check the reCaptcha result
-         if(Kohana::config('useradmin')->captcha) {
+         if(Kohana::config('useradmin')->captcha)
+	 {
             $recaptcha_resp = recaptcha_check_answer($this->recaptcha_config['privatekey'],
                                            $_SERVER['REMOTE_ADDR'],
                                            $_POST['recaptcha_challenge_field'],
                                            $_POST['recaptcha_response_field']);
-            if(!$recaptcha_resp->is_valid) {
-               $optional_checks = false;
-               $this->recaptcha_error = $recaptcha_resp->error;
-               Message::add('error', __('The captcha text is incorrect, please try again.'));
-            }
+
+		if(!$recaptcha_resp->is_valid)
+		{
+			$optional_checks = false;
+			$this->recaptcha_error = $recaptcha_resp->error;
+			Message::add('error', __('The captcha text is incorrect, please try again.'));
+		}
          }
 
 	$user = Model::factory('user');
@@ -219,7 +222,7 @@ class Controller_Useradmin_User extends Controller_App {
 		$post->rule('activation_code', array($this, 'check_activation_code'), array(':validation', ':field'));
 	}
 
-	if($post->check())
+	if($post->check() && $optional_checks)
 	{
 		$user->create_user($post);
 		$this->send_confirmation_email($post);
@@ -231,27 +234,25 @@ class Controller_Useradmin_User extends Controller_App {
 	}
 
 	// Validation failed, collect the errors
-	$post->errors('register/user');
+	$errors = $post->errors('register/user');
 
-	
+	// Move external errors to main array, for post helper compatibility
+	$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
+	$view->set('errors', $errors);
+	// Pass on the old form values
+	$_POST['password'] = $_POST['password_confirm'] = '';
+	$view->set('defaults', $_POST);
 
-
-            // Move external errors to main array, for post helper compatibility
-            $errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
-            $view->set('errors', $errors);
-            // Pass on the old form values
-            $_POST['password'] = $_POST['password_confirm'] = '';
-            $view->set('defaults', $_POST);
-         }
-      }
-      if(Kohana::config('useradmin')->activation_code) {
-	$view->set('activation_code_enabled', true);
-      }
-      if(Kohana::config('useradmin')->captcha) {
-         $view->set('captcha_enabled', true);
-         $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
-      }
-      $this->template->content = $view;
+	if(Kohana::config('useradmin')->activation_code)
+	{
+		$view->set('activation_code_enabled', true);
+	}
+	if(Kohana::config('useradmin')->captcha)
+	{
+		$view->set('captcha_enabled', true);
+		$view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+	}
+	$this->template->content = $view;
    }
 
    /**
