@@ -210,7 +210,7 @@ class Controller_Useradmin_User extends Controller_App {
          } catch (Validation_Exception $e) {
             // Get errors for display in view
             // Note how the first param is the path to the message file (e.g. /messages/register.php)
-            $errors = $e->errors('register/user');
+            //$errors = $e->errors('register/user');
             // Move external errors to main array, for post helper compatibility
             $errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
             $view->set('errors', $errors);
