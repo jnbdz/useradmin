@@ -202,28 +202,40 @@ class Controller_Useradmin_User extends Controller_App {
             }
          }
 
-         try {
-            if( ! $optional_checks ) {
-               //throw new ORM_Validation_Exception("Invalid option checks");
-            }
+	$user = Model::factory('user');
 
-	    $_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+	$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
 
-	    $model_user = new Model_User;
-	    $model_user->create_user($_POST);
-	    //Auth::instance()->register( $_POST );
+	$post = Validation::factory($_POST)
+			->rules('username', $this->_rules['username'])
+			->rule('username', array($this, 'username_available'), array(':validation', ':field'))
+			->rules('email', $this->_rules['email'])
+			->rule('email', array($this, 'email_available'), array(':validation', ':field'))
+			->rules('password', $this->_rules['password'])
+			->rules('password_confirm', $this->_rules['password_confirm']);
 
-	    $this->send_confirmation_email($_POST); 
+	if(Kohana::config('useradmin')->activation_code)
+	{
+		$post->rule('activation_code', array($this, 'check_activation_code'), array(':validation', ':field'));
+	}
 
-            // sign the user in
-            Auth::instance()->login($_POST['username'], $_POST['password']);
+	if($post->check())
+	{
+		$user->create_user($post);
+		$this->send_confirmation_email($post);
+		// Send Welcome Email
+		// sign the user in
+		Auth::instance()->login($_POST['username'], $_POST['password']);
+		// redirect to the user account
+		$this->request->redirect('user/profile');
+	}
 
-            // redirect to the user account
-            $this->request->redirect('user/profile');
-         } catch (Validation_Exception $e) {
-            // Get errors for display in view
-            // Note how the first param is the path to the message file (e.g. /messages/register.php)
-            // $errors = $e->errors('register');
+	// Validation failed, collect the errors
+	$post->errors('register/user');
+
+	
+
+
             // Move external errors to main array, for post helper compatibility
             $errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
             $view->set('errors', $errors);
