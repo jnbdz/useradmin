@@ -191,7 +191,7 @@ class Controller_Useradmin_User extends Controller_App {
 
          try {
             if( ! $optional_checks ) {
-               throw new Validation_Exception("Invalid option checks");
+               throw new Exception("Invalid option checks");
             }
 
 	    $_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
