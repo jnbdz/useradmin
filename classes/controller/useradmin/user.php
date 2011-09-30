@@ -3,7 +3,10 @@
 /**
  * User controller: user administration, also user accounts/profiles.
  *
- * @author Mikito Takada
+ * @authors 
+ * - Mikito Takada
+ * - Gabriel Reitz Giannattasio
+ * - Jean-Nicolas Boulay Desjardins
  * @package default
  * @version 1.0
  */
