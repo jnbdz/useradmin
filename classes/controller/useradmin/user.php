@@ -11,6 +11,48 @@
 class Controller_Useradmin_User extends Controller_App {
 
    /**
+    * Rules for the user model. Because the password is _always_ a hash
+    * when it's set,you need to run an additional not_empty rule in your controller
+    * to make sure you didn't hash an empty string. The password rules
+    * should be enforced outside the model or with a model helper method.
+    *
+    * @return array Rules
+    */
+    protected $_rules = array(
+		'username' => array(
+			array('not_empty'),
+			array('min_length', array(4)),
+			array('max_length', array(32)),
+			array('regex', array('/^[-\pL\pN_.]++$/uD')),
+		),
+		'password' => array(
+			array('not_empty'),
+			array('min_length', array(8)),
+			array('max_length', array(42)),
+		),
+		'password_confirm' => array(
+			array('matches', array(':validation', ':field', 'password')),
+		),
+		'email' => array(
+			array('not_empty'),
+			array('min_length', array(4)),
+			array('max_length', array(127)),
+			array('email'),
+		),
+	);
+
+	/**
+	 * Labels for fields in this model
+	 *
+	 * @return array Labels
+	 */
+	protected $_labels = array(
+		'username'         => 'username',
+		'email'            => 'email address',
+		'password'         => 'password',
+	);
+
+   /**
     * @var string Filename of the template file.
     */
    public $template = 'template/useradmin';
@@ -23,6 +65,12 @@ class Controller_Useradmin_User extends Controller_App {
     * Can be set to a string or an array, for example array('login', 'admin') or 'login'
     */
    public $auth_required = FALSE;
+   
+   /**
+    * ReCaptcha variables that are all private. So that no other code as access to the ReCaptcha keys.
+    */
+   private $recaptcha_config = NULL;
+   private $recaptcha_error = NULL;
 
    /** Controls access for separate actions
     *
@@ -42,6 +90,17 @@ class Controller_Useradmin_User extends Controller_App {
       // the others are public (forgot, login, register, reset, noaccess)
       // logout is also public to avoid confusion (e.g. easier to specify and test post-logout page)
       );
+
+    /**
+     * Load ReCaptcha configurations and vendor code.
+     */
+    public function loadReCaptcha() {
+    	if(Kohana::config('useradmin')->captcha) {
+        	include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
+        	$this->recaptcha_config = Kohana::config('recaptcha');
+        	$this->recaptcha_error = null;
+      }
+    }
 
    // USER SELF-MANAGEMENT
 
@@ -158,11 +217,7 @@ class Controller_Useradmin_User extends Controller_App {
     */
    public function action_register() {
       // Load reCaptcha if needed
-      if(Kohana::config('useradmin')->captcha) {
-         include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
-         $recaptcha_config = Kohana::config('recaptcha');
-         $recaptcha_error = null;
-      }
+      $this->loadReCaptcha();
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('User registration');
       // If user already signed-in
@@ -174,59 +229,72 @@ class Controller_Useradmin_User extends Controller_App {
       $view = View::factory('user/register');
       // If there is a post and $_POST is not empty
       if ($_POST) {
-         // optional checks (e.g. reCaptcha or some other additional check)
-         $optional_checks = true;
-         // if configured to use captcha, check the reCaptcha result
-         if(Kohana::config('useradmin')->captcha) {
-            $recaptcha_resp = recaptcha_check_answer($recaptcha_config['privatekey'],
-                                           $_SERVER['REMOTE_ADDR'],
-                                           $_POST['recaptcha_challenge_field'],
-                                           $_POST['recaptcha_response_field']);
-            if(!$recaptcha_resp->is_valid) {
-               $optional_checks = false;
-               $recaptcha_error = $recaptcha_resp->error;
-               Message::add('error', __('The captcha text is incorrect, please try again.'));
-            }
-         }
+		// optional checks (e.g. reCaptcha or some other additional check)
+		$optional_checks = true;
+		// if configured to use captcha, check the reCaptcha result
+		if(Kohana::config('useradmin')->captcha)
+		{
+			$recaptcha_resp = recaptcha_check_answer($this->recaptcha_config['privatekey'],
+						$_SERVER['REMOTE_ADDR'],
+						$_POST['recaptcha_challenge_field'],
+						$_POST['recaptcha_response_field']);
 
-         try {
-            if( ! $optional_checks ) {
-               //throw new Exception("Invalid option checks");
-            }
+			if(!$recaptcha_resp->is_valid)
+			{
+				$optional_checks = false;
+				$this->recaptcha_error = $recaptcha_resp->error;
+				Message::add('error', __('The captcha text is incorrect, please try again.'));
+			}
+		}
 
-	    $_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+		$user = Model::factory('user');
 
-	    $model_user = new Model_User;
-	    $model_user->create_user($_POST);
-	    //Auth::instance()->register( $_POST );
+		$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
 
-	    $this->send_confirmation_email($_POST); 
+		$post = Validation::factory($_POST)
+				->rules('username', $this->_rules['username'])
+				->rule('username', array($user, 'username_available'), array(':validation', ':field'))
+				->rules('email', $this->_rules['email'])
+				->rule('email', array($user, 'email_available'), array(':validation', ':field'))
+				->rules('password', $this->_rules['password'])
+				->rules('password_confirm', $this->_rules['password_confirm']);
 
-            // sign the user in
-            Auth::instance()->login($_POST['username'], $_POST['password']);
+		if(Kohana::config('useradmin')->activation_code)
+		{
+			$post->rule('activation_code', array($this, 'check_activation_code'), array(':validation', ':field'));
+		}
 
-            // redirect to the user account
-            $this->request->redirect('user/profile');
-         } catch (Validation_Exception $e) {
-            // Get errors for display in view
-            // Note how the first param is the path to the message file (e.g. /messages/register.php)
-            //$errors = $e->errors('register/user');
-            // Move external errors to main array, for post helper compatibility
-            $errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
-            $view->set('errors', $errors);
-            // Pass on the old form values
-            $_POST['password'] = $_POST['password_confirm'] = '';
-            $view->set('defaults', $_POST);
-         }
-      }
-      if(Kohana::config('useradmin')->activation_code) {
-	$view->set('activation_code_enabled', true);
-      }
-      if(Kohana::config('useradmin')->captcha) {
-         $view->set('captcha_enabled', true);
-         $view->set('recaptcha_html', recaptcha_get_html($recaptcha_config['publickey'], $recaptcha_error));
-      }
-      $this->template->content = $view;
+		if($post->check() && $optional_checks)
+		{
+			$user->create_user($post);
+			$this->send_confirmation_email($post);
+			// Send Welcome Email
+			// sign the user in
+			Auth::instance()->login($_POST['username'], $_POST['password']);
+			// redirect to the user account
+			$this->request->redirect('user/profile');
+		}
+
+		// Validation failed, collect the errors
+		$errors = $post->errors('register/user');
+
+		// Move external errors to main array, for post helper compatibility
+		$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
+		$view->set('errors', $errors);
+		// Pass on the old form values
+		$_POST['password'] = $_POST['password_confirm'] = '';
+		$view->set('defaults', $_POST);
+	} // End of if $_POST
+	if(Kohana::config('useradmin')->activation_code)
+	{
+		$view->set('activation_code_enabled', true);
+	}
+	if(Kohana::config('useradmin')->captcha)
+	{
+		$view->set('captcha_enabled', true);
+		$view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+	}
+	$this->template->content = $view;
    }
 
    /**
@@ -759,10 +827,10 @@ class Controller_Useradmin_User extends Controller_App {
                $view->set('defaults', $values);
                if(Kohana::config('useradmin')->captcha) {
                   include Kohana::find_file('vendor', 'recaptcha/recaptchalib');
-                  $recaptcha_config = Kohana::config('recaptcha');
-                  $recaptcha_error = null;
+                  $this->recaptcha_config = Kohana::config('recaptcha');
+                  $this->recaptcha_error = null;
                   $view->set('captcha_enabled', true);
-                  $view->set('recaptcha_html', recaptcha_get_html($recaptcha_config['publickey'], $recaptcha_error));
+                  $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
                }
                $this->template->content = $view;
             }
