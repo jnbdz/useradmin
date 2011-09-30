@@ -14,48 +14,6 @@
 class Controller_Useradmin_User extends Controller_App {
 
    /**
-    * Rules for the user model. Because the password is _always_ a hash
-    * when it's set,you need to run an additional not_empty rule in your controller
-    * to make sure you didn't hash an empty string. The password rules
-    * should be enforced outside the model or with a model helper method.
-    *
-    * @return array Rules
-    */
-    protected $_rules = array(
-		'username' => array(
-			array('not_empty'),
-			array('min_length', array(4)),
-			array('max_length', array(32)),
-			array('regex', array('/^[-\pL\pN_.]++$/uD')),
-		),
-		'password' => array(
-			array('not_empty'),
-			array('min_length', array(8)),
-			array('max_length', array(42)),
-		),
-		'password_confirm' => array(
-			array('matches', array(':validation', ':field', 'password')),
-		),
-		'email' => array(
-			array('not_empty'),
-			array('min_length', array(4)),
-			array('max_length', array(127)),
-			array('email'),
-		),
-	);
-
-	/**
-	 * Labels for fields in this model
-	 *
-	 * @return array Labels
-	 */
-	protected $_labels = array(
-		'username'         => 'username',
-		'email'            => 'email address',
-		'password'         => 'password',
-	);
-
-   /**
     * @var string Filename of the template file.
     */
    public $template = 'template/useradmin';
@@ -250,30 +208,17 @@ class Controller_Useradmin_User extends Controller_App {
 			}
 		}
 
-		$user = Model::factory('user');
-
 		$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
 
-		$post = Validation::factory($_POST)
-				->rules('username', $this->_rules['username'])
-				->rule('username', array($user, 'username_available'), array(':validation', ':field'))
-				->rules('email', $this->_rules['email'])
-				->rule('email', array($user, 'email_available'), array(':validation', ':field'))
-				->rules('password', $this->_rules['password'])
-				->rules('password_confirm', $this->_rules['password_confirm']);
-
-		if(Kohana::config('useradmin')->activation_code)
-		{
-			$post->rule('activation_code', array($this, 'check_activation_code'), array(':validation', ':field'));
-		}
+		$user = Model::factory('user');
+		$post = $user->create_user($_POST);
 
 		if($post->check() && $optional_checks)
 		{
-			$user->create_user($post);
 			$this->send_confirmation_email($post);
 			// Send Welcome Email
 			// sign the user in
-			Auth::instance()->login($_POST['username'], $_POST['password']);
+			Auth::instance()->login($post['username'], $post['password']);
 			// redirect to the user account
 			$this->request->redirect('user/profile');
 		}
@@ -288,6 +233,7 @@ class Controller_Useradmin_User extends Controller_App {
 		$_POST['password'] = $_POST['password_confirm'] = '';
 		$view->set('defaults', $_POST);
 	} // End of if $_POST
+
 	if(Kohana::config('useradmin')->activation_code)
 	{
 		$view->set('activation_code_enabled', true);
@@ -297,7 +243,9 @@ class Controller_Useradmin_User extends Controller_App {
 		$view->set('captcha_enabled', true);
 		$view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
 	}
+
 	$this->template->content = $view;
+
    }
 
    /**
