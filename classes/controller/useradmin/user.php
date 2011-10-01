@@ -189,7 +189,8 @@ class Controller_Useradmin_User extends Controller_App {
       // Load the view
       $view = View::factory('user/register');
       // If there is a post and $_POST is not empty
-      if ($_POST) {
+      if($_POST)
+      {
 		// optional checks (e.g. reCaptcha or some other additional check)
 		$optional_checks = true;
 		// if configured to use captcha, check the reCaptcha result
@@ -211,7 +212,7 @@ class Controller_Useradmin_User extends Controller_App {
 		$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
 
 		$user = Model::factory('user');
-		$post = $user->create_user($_POST);
+		$post = $user->create_user($_POST, $optional_checks);
 
 		if($post->check() && $optional_checks)
 		{
