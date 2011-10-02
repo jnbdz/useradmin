@@ -223,16 +223,18 @@ class Controller_Useradmin_User extends Controller_App {
 			// redirect to the user account
 			$this->request->redirect('user/profile');
 		}
+		else
+		{
+			// Validation failed, collect the errors
+			$errors = $post->errors('register/user');
 
-		// Validation failed, collect the errors
-		$errors = $post->errors('register/user');
-
-		// Move external errors to main array, for post helper compatibility
-		$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
-		$view->set('errors', $errors);
-		// Pass on the old form values
-		$_POST['password'] = $_POST['password_confirm'] = '';
-		$view->set('defaults', $_POST);
+			// Move external errors to main array, for post helper compatibility
+			$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
+			$view->set('errors', $errors);
+			// Pass on the old form values
+			$_POST['password'] = $_POST['password_confirm'] = '';
+			$view->set('defaults', $_POST);
+		}
 	} // End of if $_POST
 
 	if(Kohana::config('useradmin')->activation_code)
