@@ -214,7 +214,7 @@ class Controller_Useradmin_User extends Controller_App {
 		$user = Model::factory('user');
 		$post = $user->create_user($_POST, $optional_checks);
 
-		if($post->check() && $optional_checks)
+		if($post->valid && $optional_checks)
 		{
 			$this->send_confirmation_email($post);
 			// Send Welcome Email
