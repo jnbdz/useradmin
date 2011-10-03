@@ -6,9 +6,14 @@
 <?php
 echo Form::open('user/forgot');
 echo '<p>'.__('Your email address:').' '.Form::input('reset_email', '', array('class' => 'text')).'</p>';
-?>
 
-<?php
+ if(isset($captcha_enabled) && $captcha_enabled)
+ { ?>
+   <li>
+       <?php echo $recaptcha_html; ?>
+       <br/>
+   </li>
+<?php }
 echo Form::submit(NULL, __('Reset password'));
 echo Form::close();
 ?>
