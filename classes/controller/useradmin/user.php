@@ -227,7 +227,6 @@ class Controller_Useradmin_User extends Controller_App {
 		{
 			// Validation failed, collect the errors
 			$errors = $post->errors('register/user');
-
 			// Move external errors to main array, for post helper compatibility
 			$errors = array_merge($errors, (isset($errors['_external']) ? $errors['_external'] : array()));
 			$view->set('errors', $errors);
@@ -475,6 +474,8 @@ class Controller_Useradmin_User extends Controller_App {
     * A basic implementation of the "Forgot password" functionality
     */
    public function action_forgot() {
+      // Load reCaptcha if needed
+      $this->loadReCaptcha();
       // Password reset must be enabled in config/useradmin.php
       if(!Kohana::config('useradmin')->email) {
          Message::add('error', 'Password reset via email is not enabled. Please contact the site administrator to reset your password.');
@@ -482,7 +483,26 @@ class Controller_Useradmin_User extends Controller_App {
       }
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Forgot password');
-      if(isset($_POST['reset_email'])) {
+      if(isset($_POST['reset_email']))
+      {
+		// optional checks (e.g. reCaptcha or some other additional check)
+		$optional_checks = true;
+		// if configured to use captcha, check the reCaptcha result
+		if(Kohana::config('useradmin')->captcha)
+		{
+			$recaptcha_resp = recaptcha_check_answer($this->recaptcha_config['privatekey'],
+						$_SERVER['REMOTE_ADDR'],
+						$_POST['recaptcha_challenge_field'],
+						$_POST['recaptcha_response_field']);
+
+			if(!$recaptcha_resp->is_valid)
+			{
+				$optional_checks = false;
+				$this->recaptcha_error = $recaptcha_resp->error;
+				Message::add('error', __('The captcha text is incorrect, please try again.'));
+			}
+		}
+
 	 CASSANDRA::selectColumnFamily('Users');
 	 $user = CASSANDRA::getIndexedSlices(array('email' => $_POST['reset_email']));
 	 foreach($user_infos as $uuid => $cols) {
@@ -516,19 +536,35 @@ class Controller_Useradmin_User extends Controller_App {
             $message_swift = Swift_Message::newInstance($subject, $body)
                     ->setFrom($from)
                     ->setTo($to);
-            if($mailer->send($message_swift)) {
+            if($mailer->send($message_swift))
+	    {
                Message::add('success', __('Password reset email sent.'));
                $this->request->redirect('user/login');
-            } else {
+            }
+	    else
+	    {
                Message::add('failure', __('Could not send email.'));
             }
-         } else if ($user->username == 'admin') {
+         }
+	 else if($user->username == 'admin')
+	 {
             Message::add('error', __('Admin account password cannot be reset via email.'));
-         } else {
+         }
+	 else
+	 {
             Message::add('error', __('User account could not be found.'));
          }
-      }
-     $this->template->content = View::factory('user/reset/forgot');
+	}
+
+	$view = View::factory('user/reset/forgot');
+
+	if(Kohana::config('useradmin')->captcha)
+        {
+                $view->set('captcha_enabled', true);
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+        }
+
+     $this->template->content = $view;
    }
 
    /**
