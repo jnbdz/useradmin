@@ -23,6 +23,15 @@ echo '<li>'.$form->label('username', __('Email or Username')).'</li>';
 echo $form->input('username', null, array('class' => 'text twothirds'));
 echo '<li>'.$form->label('password', __('Password')).'</li>';
 echo $form->password('password', null, array('class' => 'text twothirds'));
+
+if(isset($captcha_enabled) && $captcha_enabled && isset($need_captcha) && $need_captcha)
+{
+ echo '<li>';
+       echo $recaptcha_html;
+       echo '  <br/>
+   </li>';
+}
+
 echo '</ul>';
 echo $form->submit(NULL, __('Login'));
 echo '<small> '.Html::anchor('user/forgot', __('Forgot your password?')).'<br></small>';
