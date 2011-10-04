@@ -13,6 +13,12 @@ echo Form::open('user/reset');
       <label><?php echo __('Password reset token'); ?>:</label>
       <?php echo Form::input('reset_token', '', array('class' => 'text')) ?>
    </li>
+<?php if(isset($captcha_enabled) && $captcha_enabled) { ?>
+   <li>
+       <?php echo $recaptcha_html; ?>
+       <br/>
+   </li>
+   <?php } ?>
 </ul>
 <br style="clear:both;">
 <?php echo Form::submit(NULL, __('Reset password')); ?>
