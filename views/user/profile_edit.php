@@ -39,6 +39,17 @@ echo $form->open('user/profile_edit');
       ?>
             </table>
       </li>
+<?php
+
+if(isset($captcha_enabled) && $captcha_enabled && isset($need_captcha) && $need_captcha)
+{
+ echo '<li>';
+       echo $recaptcha_html;
+       echo '  <br/>
+   </li>';
+}
+
+?>
    </ul>
    <br>
 <?php
