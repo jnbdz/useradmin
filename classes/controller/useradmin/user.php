@@ -106,6 +106,8 @@ class Controller_Useradmin_User extends Controller_App {
     * View: Profile editor
     */
    public function action_profile_edit() {
+      // Load reCaptcha if needed
+      $this->loadReCaptcha();
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Edit user profile');
       $user = Auth::instance()->get_user(); 
@@ -168,7 +170,14 @@ class Controller_Useradmin_User extends Controller_App {
       /*foreach($user->roles->find_all() as $role) {
           $roles[$role->name] = $role->description;
        }*/
-     // $view->set('user_roles', $roles); 
+     // $view->set('user_roles', $roles);
+
+	if(Kohana::config('useradmin')->captcha)
+     	{
+                $view->set('captcha_enabled', true);
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+     	}
+ 
       $this->template->content = $view;
 
    }
@@ -399,6 +408,8 @@ class Controller_Useradmin_User extends Controller_App {
     * View: Login form.
     */
    public function action_login() {
+      // Load reCaptcha if needed
+      $this->loadReCaptcha();
       // ajax login
       if($this->request->is_ajax() && isset($_REQUEST['username'], $_REQUEST['password'])) {
          $this->auto_render = false;
@@ -455,6 +466,13 @@ class Controller_Useradmin_User extends Controller_App {
          }
          $providers = Kohana::config('useradmin.providers');
          $view->set('facebook_enabled', isset($providers['facebook']) ? $providers['facebook'] : false);
+
+	if(Kohana::config('useradmin')->captcha)
+     	{
+                $view->set('captcha_enabled', true);
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+     	}
+
          $this->template->content = $view;
       }
    }
@@ -571,8 +589,11 @@ class Controller_Useradmin_User extends Controller_App {
     * A basic version of "reset password" functionality.
     */
   function action_reset() {
+      // Load reCaptcha if needed
+      $this->loadReCaptcha();
       // Password reset must be enabled in config/useradmin.php
-      if(!Kohana::config('useradmin')->email) {
+      if(!Kohana::config('useradmin')->email)
+      {
          Message::add('error', 'Password reset via email is not enabled. Please contact the site administrator to reset your password.');
          $this->request->redirect('user/register');
       }
@@ -597,7 +618,16 @@ class Controller_Useradmin_User extends Controller_App {
             }
         }
      }
-     $this->template->content = View::factory('user/reset/reset');
+
+     $view = View::factory('user/reset/reset');
+
+     if(Kohana::config('useradmin')->captcha)
+     {
+                $view->set('captcha_enabled', true);
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+     }
+
+     $this->template->content = $view;
   }
 
   /**
