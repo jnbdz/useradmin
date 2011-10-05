@@ -25,7 +25,7 @@ echo $form->open('user/register');
    <li><label><?php echo __('Username'); ?></label></li>
    <?php echo $form->input('username', null, array('info' => __('Length between 4-32 characters. Letters, numbers, dot and underscore are allowed characters.'))); ?>
    <li><label><?php echo __('Email address'); ?></label></li>
-   <?php echo $form->input('email') ?>
+   <?php echo $form->input('email', NULL, array('type' => 'email')) ?>
    <li><label><?php echo __('Password'); ?></label></li>
    <?php echo $form->password('password', null, array('info' => __('Password should be between 6-42 characters.'))); ?>
    <li><label><?php echo __('Re-type Password'); ?></label></li>
