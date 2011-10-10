@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
 return array(
-    /**
-     * The title is used for the header of every page and in the emails send. It is used to help name your application.
-     */
-    'title' => 'Useradmin for Kohana',
-    /**
-     * The number of failed logins allowed can be specified here:
-     * If the user mistypes their password X times, then they will not be permitted to log in during the jail time.
-     * This helps prevent brute-force attacks.
-     */
-   'auth' => array(
+     /**
+      * The title is used for the header of every page and in the emails send. It is used to help name your application.
+      */
+     'title' => 'Useradmin for Kohana',
+     /**
+      * The number of failed logins allowed can be specified here:
+      * If the user mistypes their password X times, then they will not be permitted to log in during the jail time.
+      * This helps prevent brute-force attacks.
+      */
+     'auth' => array(
       /**
        * Define the maximum failed attempts to login
        * set 0 to disable the login jail
@@ -21,6 +21,10 @@ return array(
        * wait before his next attempt
        */
       'login_jail_time' => "5 minutes",
+      /**
+       * Reset token max time it can kept.
+       */
+      'reset_token_max_time' => 1800,
     ),
     /**
      * 3rd party providers supported/allowed.
