@@ -522,52 +522,59 @@ class Controller_Useradmin_User extends Controller_App {
 		}
 
 	 CASSANDRA::selectColumnFamily('Users');
-	 $user = CASSANDRA::getIndexedSlices(array('email' => $_POST['reset_email']));
+	 $user_infos = CASSANDRA::getIndexedSlices(array('email' => $_POST['reset_email']));
 	 foreach($user_infos as $uuid => $cols) {
 		$cols['uuid'] = $uuid;
 		$user = $cols;
 	 }
          // admin passwords cannot be reset by email
-         if ($user['uuid'] && ($user['username'] != 'admin')) {
-            // send an email with the account reset token
-            $user->reset_token = $user->generate_password(32);
-            $user->save();
+         if($user['uuid'] && ($user['username'] != 'admin') && $optional_checks)
+	 {
+		// send an email with the account reset token
+		$model_user = Model::factory('user');
+		$reset_token = $model_user->reset_token($user, $_POST);
 
-            $message = "You have requested a password reset. You can reset password to your account by visiting the page at:\n\n"
-            .":reset_token_link\n\n"
-            ."If the above link is not clickable, please visit the following page:\n"
-            .":reset_link\n\n"
-            ."and copy/paste the following Reset Token: :reset_token\nYour user account name is: :username\n";
+		$message = "You have requested a password reset. You can reset password to your account by visiting the page at:\n\n"
+			   .":reset_token_link\n\n"
+			   ."If the above link is not clickable, please visit the following page:\n"
+			   .":reset_link\n\n"
+			   ."and copy/paste the following Reset Token: :reset_token\nYour user account name is: :username\n";
 
-            $mailer = Email::connect();
-            // Create complex Swift_Message object stored in $message
-            // MUST PASS ALL PARAMS AS REFS
-            $subject = __('Account password reset');
-            $to = $_POST['reset_email'];
-            $from = Kohana::config('useradmin')->email_address;
-            $body =  __($message, array(
-                ':reset_token_link' => URL::site('user/reset?reset_token='.$user->reset_token.'&reset_email='.$_POST['reset_email'], TRUE),
-                ':reset_link' => URL::site('user/reset', TRUE),
-                ':reset_token' => $user->reset_token,
-                ':username' => $user->username
-            ));
-            $message_swift = Swift_Message::newInstance($subject, $body)
-                    ->setFrom($from)
-                    ->setTo($to);
-            if($mailer->send($message_swift))
-	    {
-               Message::add('success', __('Password reset email sent.'));
-               $this->request->redirect('user/login');
-            }
-	    else
-	    {
-               Message::add('failure', __('Could not send email.'));
-            }
+		$mailer = Email::connect();
+		// Create complex Swift_Message object stored in $message
+		// MUST PASS ALL PARAMS AS REFS
+		$subject = __('Account password reset');
+		$to = $_POST['reset_email'];
+		$from = Kohana::config('useradmin')->email_address;
+		$body =  __($message, array(
+				':reset_token_link' => URL::site('user/reset?reset_token='.$reset_token.'&reset_email='.$_POST['reset_email'], TRUE),
+				':reset_link' => URL::site('user/reset', TRUE),
+				':reset_token' => $reset_token,
+				':username' => $user['username']
+			));
+		$message_swift = Swift_Message::newInstance($subject, $body)
+			->setFrom($from)
+			->setTo($to);
+
+		if($mailer->send($message_swift))
+		{
+			Message::add('success', __('Password reset email sent.'));
+			$this->request->redirect('user/login');
+		}
+		else
+		{
+			Message::add('failure', __('Could not send email.'));
+		}
+
          }
-	 else if($user->username == 'admin')
+	 else if($user['username'] == 'admin')
 	 {
             Message::add('error', __('Admin account password cannot be reset via email.'));
          }
+	 else if(!$optional_checks)
+	 {
+		Message::add('error', __('The captcha is wrong.'));
+	 }
 	 else
 	 {
             Message::add('error', __('User account could not be found.'));
@@ -601,7 +608,9 @@ class Controller_Useradmin_User extends Controller_App {
       $this->template->title = __('Reset password');
       if(isset($_REQUEST['reset_token']) && isset($_REQUEST['reset_email'])) {
          // make sure that the reset_token has exactly 32 characters (not doing that would allow resets with token length 0)
-         if( (strlen($_REQUEST['reset_token']) == 32) && (strlen(trim($_REQUEST['reset_email'])) > 1) ) {
+         if( (strlen($_REQUEST['reset_token']) == 32) && (strlen(trim($_REQUEST['reset_email'])) > 1) )
+	 {
+	    CASSANDRA::selectColumnFamily('Users')->
             $user = ORM::factory('user')->where('email', '=', $_REQUEST['reset_email'])->and_where('reset_token', '=', $_REQUEST['reset_token'])->find();
             // The admin password cannot be reset by email
             if ($user->username == 'admin') {
