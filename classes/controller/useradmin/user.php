@@ -521,6 +521,9 @@ class Controller_Useradmin_User extends Controller_App {
 			}
 		}
 
+	 $model_user = Model::factory('user');
+	 $user_info = $model_user->get_user_via_email($_POST['reset_email']);
+
 	 CASSANDRA::selectColumnFamily('Users');
 	 $user_infos = CASSANDRA::getIndexedSlices(array('email' => $_POST['reset_email']));
 	 foreach($user_infos as $uuid => $cols) {
@@ -531,8 +534,7 @@ class Controller_Useradmin_User extends Controller_App {
          if($user['uuid'] && ($user['username'] != 'admin') && $optional_checks)
 	 {
 		// send an email with the account reset token
-		$model_user = Model::factory('user');
-		$reset_token = $model_user->reset_token($user, $_POST);
+		$reset_token = $model_user->reset_token($user['uuid'], $_POST);
 
 		$message = "You have requested a password reset. You can reset password to your account by visiting the page at:\n\n"
 			   .":reset_token_link\n\n"
