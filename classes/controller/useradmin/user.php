@@ -522,14 +522,8 @@ class Controller_Useradmin_User extends Controller_App {
 		}
 
 	 $model_user = Model::factory('user');
-	 $user_info = $model_user->get_user_via_email($_POST['reset_email']);
+	 $user = $model_user->get_user_by_email($_POST['reset_email']);
 
-	 CASSANDRA::selectColumnFamily('Users');
-	 $user_infos = CASSANDRA::getIndexedSlices(array('email' => $_POST['reset_email']));
-	 foreach($user_infos as $uuid => $cols) {
-		$cols['uuid'] = $uuid;
-		$user = $cols;
-	 }
          // admin passwords cannot be reset by email
          if($user['uuid'] && ($user['username'] != 'admin') && $optional_checks)
 	 {
@@ -595,11 +589,33 @@ class Controller_Useradmin_User extends Controller_App {
    }
 
    /**
+    * Generates a password of given length using mt_rand.
+    * @param int $length
+    * @return string
+    */
+   function generate_password($length = 8) {
+      // start with a blank password
+      $password = "";
+      // define possible characters (does not include l, number relatively likely)
+      $possible = "123456789abcdefghjkmnpqrstuvwxyz123456789";
+      $i = 0;
+      // add random characters to $password until $length is reached
+      while ($i < $length) {
+         // pick a random character from the possible ones
+         $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
+
+         $password .= $char;
+         $i++;
+
+      }
+      return $password;
+   }
+
+   /**
     * A basic version of "reset password" functionality.
     */
-  function action_reset() {
-      // Load reCaptcha if needed
-      $this->loadReCaptcha();
+  function action_reset()
+  {
       // Password reset must be enabled in config/useradmin.php
       if(!Kohana::config('useradmin')->email)
       {
@@ -612,31 +628,26 @@ class Controller_Useradmin_User extends Controller_App {
          // make sure that the reset_token has exactly 32 characters (not doing that would allow resets with token length 0)
          if( (strlen($_REQUEST['reset_token']) == 32) && (strlen(trim($_REQUEST['reset_email'])) > 1) )
 	 {
-	    CASSANDRA::selectColumnFamily('Users')->
-            $user = ORM::factory('user')->where('email', '=', $_REQUEST['reset_email'])->and_where('reset_token', '=', $_REQUEST['reset_token'])->find();
+	    $model_user = Model::factory('user');
+            $user = $model_user->get_user_by_email($_POST['reset_email']);
+
             // The admin password cannot be reset by email
-            if ($user->username == 'admin') {
+            if ($user['username'] == 'admin')
+	    {
                Message::add('failure', __('The admin password cannot be reset by email.'));
-            } else if (is_numeric($user->id) && ($user->reset_token == $_REQUEST['reset_token'])) {
-               $password = $user->generate_password();
-               $user->password = $password;
-// This field does not exist in the default config:
-//               $user->failed_login_count = 0;
-               $user->save();
+            }
+	    else if (is_numeric($user['uuid']) && ($user['reset_token'] == $_REQUEST['reset_token']))
+	    {
+               $password = $this->generate_password();
+	       $model_user->change_password($user, $password);
                Message::add('success', __('Password reset.'));
                Message::add('success', '<p>'.__('Your password has been reset to: ":password".', array(':password' => $password)).'</p><p>'.__('Please log in below.').'</p>');
-               $this->request->redirect('user/login?username='.$user->username);
+               $this->request->redirect('user/login?username='.$user['username']);
             }
         }
      }
 
      $view = View::factory('user/reset/reset');
-
-     if(Kohana::config('useradmin')->captcha)
-     {
-                $view->set('captcha_enabled', true);
-                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
-     }
 
      $this->template->content = $view;
   }
@@ -648,23 +659,27 @@ class Controller_Useradmin_User extends Controller_App {
       // set the template title (see Controller_App for implementation)
       $this->template->title = __('Change password');
       $user = Auth::instance()->get_user();
-      $id = $user->id;
+      $id = $user->uuid;
       // load the content from view
       $view = View::factory('user/change_password');
 
       // save the data
-      if ( !empty($_POST) && is_numeric($id) ) {
+      if ( !empty($_POST) && is_numeric($id) )
+      {
          // editing requires that the username and email do not exist (EXCEPT for this ID)
          // If the post data validates using the rules setup in the user model
          $param_by_ref = array('password' => $_POST['password'], 'password_confirm' => $_POST['password_confirm']);
          $validate = $user->change_password($param_by_ref, FALSE);
-         if ($validate) {
+         if($validate)
+	 {
             // message: save success
             Message::add('success', __('Values saved.'));
             // redirect and exit
             $this->role_redirect();
             return;
-         } else {
+         }
+	 else
+	 {
             // UNFORTUNATELY, it is NOT possible to get errors for display in view
             // since they will never be returned by change_password()
             Message::add('error', __('Password could not be changed, please make sure that the passwords match.'));
@@ -672,7 +687,9 @@ class Controller_Useradmin_User extends Controller_App {
             $_POST['password'] = $_POST['password_confirm'] = '';
             $view->set('defaults', $_POST);
          }
-      } else {
+      }
+      else
+      {
          // load the information for viewing
          $view->set('data', $user->as_array());
       }
