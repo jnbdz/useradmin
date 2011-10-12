@@ -134,7 +134,7 @@ class Controller_Useradmin_User extends Controller_App {
 		else
 		{
 			$send_email = TRUE;
-			$_POST['email_code'] = Auth::instance()->hash(date('YmdHis', time()));
+			$_POST['email_code'] = $model_user->generate_uuid1();
 		}
 
 		$model_user->update_user($_POST);
