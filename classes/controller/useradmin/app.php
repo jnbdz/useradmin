@@ -50,7 +50,7 @@ class Controller_Useradmin_App extends Controller {
     * - redirect to a different failure page from one part of the application
     */
    public function access_required() {
-      $this->request->redirect('user/noaccess');
+      $this->request->redirect('user/action/noaccess');
    }
 
    /**
@@ -59,7 +59,7 @@ class Controller_Useradmin_App extends Controller {
     * Override this in your own Controller / Controller_App.
     */
    public function login_required() {
-      Request::current()->redirect('user/login');
+      Request::current()->redirect('user/action/login');
    }
 
    /**
