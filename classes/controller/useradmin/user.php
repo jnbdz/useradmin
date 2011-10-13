@@ -94,6 +94,7 @@ class Controller_Useradmin_User extends Controller_App {
       $this->template->title = __('User profile');
       if ( Auth::instance()->logged_in() == false ){
          // No user is currently logged in
+	die('Will redirect!');
          $this->request->redirect('user/action/login');
       }
       $view = $this->template->content = View::factory('user/profile');
@@ -798,7 +799,8 @@ class Controller_Useradmin_User extends Controller_App {
    function action_provider_return($provider_name = null) {
       $provider = Provider::factory($provider_name);
       $model_user = Model::factory('user');
-      if(!is_object($provider)) {
+      if(!is_object($provider))
+      {
          Message::add('error', 'Provider is not enabled; please select another provider or log in normally.');
          $this->request->redirect('user/action/login');
          return;
