@@ -18,7 +18,7 @@ if(isset($defaults)) {
    unset($_POST['password_confirmation']);
    $form->defaults = $_POST;
 }
-echo $form->open('user/register');
+echo $form->open('user/action/register');
 ?>
 
 <ul>

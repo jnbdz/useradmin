@@ -2,8 +2,8 @@
 <div class="block">
    <div class="submenu">
       <ul>
-         <li><?php echo Html::anchor('user/profile_edit', __('Edit profile')); ?></li>
-         <li><?php echo Html::anchor('user/unregister', __('Delete account')); ?></li>
+         <li><?php echo Html::anchor('user/action/profile_edit', __('Edit profile')); ?></li>
+         <li><?php echo Html::anchor('user/action/unregister', __('Delete account')); ?></li>
       </ul>
       <br style="clear:both;">
    </div>
@@ -32,7 +32,7 @@
       if(!empty($providers)) {
          echo '<h2>Additional account providers</h2><p>Click the provider icon to associate it with your existing account.</p><p>';
          foreach($providers as $provider => $enabled) {
-            echo '<a class="associated_account '.$provider.'" href="'.URL::site('/user/associate/'.$provider).'"></a>';
+            echo '<a class="associated_account '.$provider.'" href="'.URL::site('/user/action/associate/'.$provider).'"></a>';
          }
          echo '<br style="clear: both;"></p>';
       }

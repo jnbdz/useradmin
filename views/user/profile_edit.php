@@ -7,7 +7,7 @@ if(isset($data)) {
    unset($data['password']);
    $form->values = $data;
 }
-echo $form->open('user/profile_edit');
+echo $form->open('user/action/profile_edit');
 ?>
 <div class="block">
    <h1><?php echo __('Edit profile'); ?></h1>

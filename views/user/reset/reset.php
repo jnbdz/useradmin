@@ -2,7 +2,7 @@
    <h1><?php echo __('Password reset'); ?></h1>
    <div class="content">
 <?php
-echo Form::open('user/reset');
+echo Form::open('user/action/reset');
 ?>
 <ul>
    <li>

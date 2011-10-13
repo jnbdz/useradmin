@@ -4,7 +4,7 @@
    <div class="content">
       <p><?php echo __('Please send me a link to reset my password.'); ?></p>
 <?php
-echo Form::open('user/forgot');
+echo Form::open('user/action/forgot');
 echo '<p>'.__('Your email address:').' '.Form::input('reset_email', '', array('class' => 'text')).'</p>';
 
  if(isset($captcha_enabled) && $captcha_enabled)

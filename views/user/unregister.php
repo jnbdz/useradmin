@@ -3,7 +3,7 @@
    <div class="content">
 <?php
 
-echo Form::open('user/unregister/'.$id, array('style' => 'display: inline;'));
+echo Form::open('user/action/unregister/'.$id, array('style' => 'display: inline;'));
 
 echo Form::hidden('id', $id);
 
@@ -15,7 +15,7 @@ echo Form::radio('confirmation', 'N', true).' No<br/></p>';
 echo Form::submit(NULL, 'Confirm');
 echo Form::close();
 
-echo Form::open('user/profile', array('style' => 'display: inline; padding-left: 10px;'));
+echo Form::open('user/action/profile', array('style' => 'display: inline; padding-left: 10px;'));
 echo Form::submit(NULL, 'Cancel');
 echo Form::close();
 ?>
