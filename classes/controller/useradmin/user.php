@@ -94,12 +94,10 @@ class Controller_Useradmin_User extends Controller_App {
       $this->template->title = __('User profile');
       if ( Auth::instance()->logged_in() == false ){
          // No user is currently logged in
-	die('Will redirect!');
          $this->request->redirect('user/action/login');
       }
       $view = $this->template->content = View::factory('user/profile');
       // retrieve the current user and set the view variable accordingly
-//die(var_dump(Auth::instance()->get_user()));
       $view->set('user', Auth::instance()->get_user() );
    }
 
@@ -437,7 +435,6 @@ class Controller_Useradmin_User extends Controller_App {
             // redirect to the user account
             $this->request->redirect('user/action/profile');
          }
-//die('logged_in = FALSE');
          $view = View::factory('user/login');
          // If there is a post and $_POST is not empty
          if ($_REQUEST && isset($_REQUEST['username'], $_REQUEST['password'])) {
