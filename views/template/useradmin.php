@@ -18,11 +18,11 @@
 
              if (Auth::instance()->logged_in()){
 		echo '<li>'.Html::anchor('admin_user', 'User admin').'</li>';
-                echo '<li>'.Html::anchor('user/profile', 'My profile').'</li>';
-                echo '<li>'.Html::anchor('user/logout', 'Log out').'</li>';
+                echo '<li>'.Html::anchor('user/action/profile', 'My profile').'</li>';
+                echo '<li>'.Html::anchor('user/action/logout', 'Log out').'</li>';
              } else {
-                echo '<li>'.Html::anchor('user/register', 'Register').'</li>';
-                echo '<li>'.Html::anchor('user/login', 'Log in').'</li>';
+                echo '<li>'.Html::anchor('user/action/register', 'Register').'</li>';
+                echo '<li>'.Html::anchor('user/action/login', 'Log in').'</li>';
              }
            ?>
          </ul>
