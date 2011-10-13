@@ -21,23 +21,6 @@ class Model_Useradmin_User extends Model_Auth_User {
    protected $_created_column = array('column' => 'created', 'format' => 'Y-m-d H:i:s');
    protected $_updated_column = array('column' => 'modified', 'format' => 'Y-m-d H:i:s');
 
-   /**
-    * Rules for the user model. Because the password is _always_ a hash
-    * when it's set,you need to run an additional not_empty rule in your controller
-    * to make sure you didn't hash an empty string. The password rules
-    * should be enforced outside the model or with a model helper method.
-    *
-    * @return array Rules
-    * @see Model_Auth_User::rules
-    */
-   public function rules()
-   {
-      $parent = parent::rules();
-      // fixes the min_length username value
-      $parent['username'][1] = array('min_length', array(':value', 1));
-      return $parent;
-   }
-
    // TODO overload filters() and add username/created_on/updated_on coluns filters
 
    /**
@@ -65,7 +48,8 @@ class Model_Useradmin_User extends Model_Auth_User {
       $possible = "123456789abcdefghjkmnpqrstuvwxyz123456789";
       $i = 0;
       // add random characters to $password until $length is reached
-      while ($i < $length) {
+      while ($i < $length)
+      {
          // pick a random character from the possible ones
          $char = substr($possible, mt_rand(0, strlen($possible)-1), 1);
 
@@ -100,7 +84,8 @@ class Model_Useradmin_User extends Model_Auth_User {
       $base = $this->transcribe($base);
       $username = $base;
       $i = 2;
-      while($this->username_exist($username)) {
+      while($this->username_exist($username))
+      {
          $username = $base.$i;
          $i++;
       }
@@ -114,7 +99,7 @@ class Model_Useradmin_User extends Model_Auth_User {
     */
    public function username_exist($username) 
    {
-      return ( (bool) $this->unique_key_exists( $username, 'username') ) ;
+      return ( (bool) $this->unique_key_exists('username', $username) ) ;
    }
 
 }
