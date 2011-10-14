@@ -115,8 +115,10 @@ class Controller_Useradmin_User extends Controller_App {
       $view = View::factory('user/profile_edit');
 
       // save the data
-      if ( !empty($_POST) ) {
-         if(empty($_POST['password']) || empty($_POST['password_confirm'])) {
+      if ( !empty($_POST) )
+      {
+         if(empty($_POST['password']) || empty($_POST['password_confirm']))
+	 {
             // force unsetting the password! Otherwise Kohana3 will automatically hash the empty string - preventing logins
             unset($_POST['password'], $_POST['password_confirm']);
          }
@@ -363,7 +365,7 @@ class Controller_Useradmin_User extends Controller_App {
             $subject = __('Confirm your subscription.');
             $body = __($message, array(
                                         ':title'        => Kohana::config('useradmin')->title,
-                                        ':email_code_address'  => HTML::anchor('/user/confirm_email/'.$fields['email_code'], URL::base().'user/confirm_email/'.$fields['email_code']),
+                                        ':email_code_address'  => HTML::anchor('/user/action/confirm_email/'.$fields['email_code'], URL::base().'user/action/confirm_email/'.$fields['email_code']),
                                 ));
 
             $message_swift = Swift_Message::newInstance($subject, $body, "text/html")
@@ -541,8 +543,8 @@ class Controller_Useradmin_User extends Controller_App {
 		$to = $_POST['reset_email'];
 		$from = Kohana::config('useradmin')->email_address;
 		$body =  __($message, array(
-				':reset_token_link' => URL::site('user/reset?reset_token='.$reset_token.'&reset_email='.$_POST['reset_email'], TRUE),
-				':reset_link' => URL::site('user/reset', TRUE),
+				':reset_token_link' => URL::site('user/action/reset?reset_token='.$reset_token.'&reset_email='.$_POST['reset_email'], TRUE),
+				':reset_link' => URL::site('user/action/reset', TRUE),
 				':reset_token' => $reset_token,
 				':username' => $user['username']
 			));
