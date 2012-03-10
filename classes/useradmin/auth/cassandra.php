@@ -74,6 +74,37 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 		return $status;
 	}
 	
+    /**
+    * Register a single user
+    * Method to register new user by Useradmin Auth module, when you set the
+    * fields, be sure they must respect the driver rules
+    *
+    * @param array $fields An array witch contains the fields to be populate
+    * @returnboolean Operation final status
+    * @see Useradmin_Driver_iAuth::register()
+    */
+
+    public function register($fields)
+    {
+
+        try 
+        {
+            $model_User = new Model_User;
+            $model_User->create_user($fields);
+        } 
+
+        catch (Validation_Exception $e)
+        {
+            echo var_dump($e);
+            die('dead!');
+            throw $e;
+            return FALSE;
+
+        }
+  	
+        return TRUE;
+    }
+    
 	/**
 	 * Unegister multiple users
 	 * Method to unregister existing user by Useradmin Auth module, when you set the
@@ -86,7 +117,9 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 	public function unregister ($users)
 	{
 		if( ! is_array($users))
+        {
 			$users = array($users);
+        }
 
 		$model_User = new Model_User();
 
@@ -95,7 +128,7 @@ class Useradmin_Auth_CASSANDRA extends Kohana_Auth_CASSANDRA implements Useradmi
 			try
 			{
 				$model_User->delete_user($user);
-			} 
+			}
 			catch (Exception $e) 
 			{
 				throw $e;
