@@ -1,8 +1,7 @@
-
 TUTORIAL
 ========
 
-NEW: Upgraded to support Kohana 3.1.x! Thank you gartz for this! If you need KO 3.0.x support, use the Feb 27th version.
+NEW: Upgraded to support Kohana 3.2.x! Thank you gartz for this! If you need KO 3.0.x support, use the Feb 27th version.
 
 Most recent, detailed tutorial - note, documentation still needs an update:
 
@@ -35,11 +34,17 @@ CONTRIBUTORS
 
 I would like to thank:
 
-* [jnbdz](https://bitbucket.org/jnbdz/useradmin/) for adding the reCaptcha support.
+* [jnbdz](https://bitbucket.org/jnbdz/useradmin/) for adding the reCaptcha support and adding support for other DBs like Cassandra.
 * [gartz](https://github.com/gartz/useradmin/) for doing upgrading the module to support Kohana 3.1.x.
 
 CHANGELOG
 =========
+
+March 9th 2012:
+
+* Removed all the DB calls in models files.
+* Added reCaptcha support to other part of the module.
+* Added email verification when new user subscribe.
 
 March 19th 2011:
 
