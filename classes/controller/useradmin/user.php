@@ -176,7 +176,7 @@ class Controller_Useradmin_User extends Controller_App {
 	if(Kohana::config('useradmin')->captcha)
      	{
                 $view->set('captcha_enabled', true);
-                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error, $this->recaptcha_config['use_ssl']));
      	}
  
       $this->template->content = $view;
@@ -253,7 +253,7 @@ class Controller_Useradmin_User extends Controller_App {
 	if(Kohana::config('useradmin')->captcha)
 	{
 		$view->set('captcha_enabled', true);
-		$view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+		$view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error, $this->recaptcha_config['use_ssl']));
 	}
 
 	$this->template->content = $view;
@@ -470,7 +470,7 @@ class Controller_Useradmin_User extends Controller_App {
 	if(Kohana::config('useradmin')->captcha)
      	{
                 $view->set('captcha_enabled', true);
-                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error, $this->recaptcha_config['use_ssl']));
      	}
 
          $this->template->content = $view;
@@ -582,7 +582,7 @@ class Controller_Useradmin_User extends Controller_App {
 	if(Kohana::config('useradmin')->captcha)
         {
                 $view->set('captcha_enabled', true);
-                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+                $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error, $this->recaptcha_config['use_ssl']));
         }
 
      $this->template->content = $view;
@@ -881,7 +881,7 @@ class Controller_Useradmin_User extends Controller_App {
                   $this->recaptcha_config = Kohana::config('recaptcha');
                   $this->recaptcha_error = null;
                   $view->set('captcha_enabled', true);
-                  $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error));
+                  $view->set('recaptcha_html', recaptcha_get_html($this->recaptcha_config['publickey'], $this->recaptcha_error, $this->recaptcha_config['use_ssl']));
                }
                $this->template->content = $view;
             }

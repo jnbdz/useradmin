@@ -2,5 +2,6 @@
  
 return array(
    'publickey' => '',
-   'privatekey' => ''
+   'privatekey' => '',
+   'use_ssl' => ''
 );
