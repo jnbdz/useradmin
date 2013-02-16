@@ -1,4 +1,12 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
+/**
+ * Useradmin User Model.
+ *
+ * @package	Useradmin/Model
+ * @authors
+ * - Jean-Nicolas Boulay
+ */
 
 class Model_Useradmin_User extends Model_Auth_User {
 

@@ -1,12 +1,13 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * AppForm class: generate application-specific markup for forms.
  * 
- * @author Mikito Takada
+ * @authors
+ * - Mikito Takada
+ * - Jean-Nicolas Boulay
  * @package default
  * @version 1.0
- *
  */
 class Appform {
 

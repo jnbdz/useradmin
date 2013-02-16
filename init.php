@@ -1,4 +1,14 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
+/**
+ * init file for Useradmin module.
+ *
+ * @package    Useradmin
+ * @authors    
+ * - Mikito Takada
+ * - Jean-Nicolas Boulay
+ */
+
 Route::set('user/action', 'user/action(/<action>(/<id>))')
 	->defaults(array(
 		'controller' => 'user',

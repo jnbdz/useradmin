@@ -1,9 +1,11 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * User controller: user administration, also user accounts/profiles.
  *
- * @author Mikito Takada
+ * @author
+ * - Mikito Takada
+ * - Jean-Nicolas Boulay
  * @package default
  * @version 1.0
  */

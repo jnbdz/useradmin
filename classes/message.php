@@ -1,4 +1,13 @@
-<?php
+<?php defined('SYSPATH') or die('No direct access allowed.');
+
+/**
+ * Message update class.
+ *
+ * @package    Useradmin
+ * @authors    
+ * - Mikito Takada
+ * - Jean-Nicolas Boulay
+ */
 
 class Message {
 
